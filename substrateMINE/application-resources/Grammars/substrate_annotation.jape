@@ -1,0 +1,59 @@
+/*
+mycoMINE @CSFG
+Substrate Annotation
+
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Concordia University, Tsang Lab, Marie-Jean Meurs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
+Phase: substrate_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Substrate_rule1
+({Lookup.majorType=="substrate"}): subst 
+-->
+:subst
+{
+try{
+  
+Annotation subst_an = (Annotation)substAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", subst_an.getStartNode().getOffset(), subst_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(substAnnots.firstNode().getOffset(), substAnnots.lastNode().getOffset()).toString();
+features.put("substrate_alias", name);
+features.put("substrate_name", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+features.put("class", "Substrate");
+features.put("annot_type", "Substrate");
+outputAS.add(subst_an.getStartNode(), subst_an.getEndNode(), "Substrate", features);
+  } catch (Exception e){
+      System.out.println("Exception in substrate_annotation, Substrate_rule1: "+e); 
+  }        
+} 

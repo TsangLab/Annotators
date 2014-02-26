@@ -1,0 +1,67 @@
+/*
+mycoMINE @CSFG
+Substrate Specificity Annotation
+
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Concordia University, Tsang Lab, Marie-Jean Meurs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
+Phase: substrateSpecificitySentence_annotation
+//Input: Lookup Sentence
+Input: Token Sentence Substrate
+Options: control = appelt
+
+Rule: substrateSpecificitySentence_rule
+(
+//{Sentence contains {Lookup.majorType == "substratespecificity"}}
+{Sentence contains {Token.string =~"[Ss]ubstrate specificit"}}
+|{Sentence contains {Token.string =~"[Ss]ubstrate"}, Sentence contains {Token.string =~"[Ss]pecificit"}}
+|{Sentence contains Substrate, Sentence contains {Token.string =~"[Ss]pecificit"}}
+): subspecsent 
+-->
+:subspecsent
+{
+try{
+
+//flag document as mentioning substrate Specificity
+doc.getFeatures().put("substrateSpecificity", "doctopic");
+  
+Annotation subspecsent_an = (Annotation)subspecsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", subspecsent_an.getStartNode().getOffset(), subspecsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(subspecsentAnnots.firstNode().getOffset(), subspecsentAnnots.lastNode().getOffset()).toString();
+features.put("substrate_specificity_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "SubstrateSpecificity");
+
+outputAS.add(subspecsent_an.getStartNode(), subspecsent_an.getEndNode(), "SubstrateSpecificity", features);
+  } catch (Exception e){
+      System.out.println("Exception in substrate_specificity_annotation, substrateSpecificitySentence_rule: "+e); 
+  }        
+} 
