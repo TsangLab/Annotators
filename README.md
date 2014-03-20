@@ -16,9 +16,5 @@ A GATE-based pipeline for substrate name tagging.
  
   -- in java projects: do not forget to set System property ```gate.home``` to your gate installation directory, and to make ```gate.jar``` and all libraries under ```gate/lib``` directory available on your classpath environment variable. (integration examples to be found [here](http://gate.ac.uk/wiki/code-repository/))
 
-
-
-
-
-
+Please consult the lib .jar files for their respective licenses.
 
