@@ -1,0 +1,79 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+// JAPE rule for aggregation of tokens potentially of interest in biomining context
+
+Phase: token_aggregation 
+Input: Token SpaceToken
+Options: control = appelt
+
+
+Rule: TokenAggregation_rule
+(
+  // |endo-|beta|-|1|,|4|-|xylanase| --> |endo-beta-1,4-xylanase|
+  (
+    {SpaceToken}
+    |({SpaceToken}{Token.string == "("})
+  )
+  (
+    (
+      (
+	{Token.string == "endo"}
+	|{Token.string == "endo"}{SpaceToken}
+	|{Token.string == "endo-"}
+	|{Token.string == "endo-"}{SpaceToken}
+	|{Token.kind == "word"}
+      )
+      |
+      (
+	{Token.string == "exo"}
+	|{Token.string == "exo"}{SpaceToken}
+	|{Token.string == "exo-"}
+	|{Token.string == "exo-"}{SpaceToken}
+	|{Token.kind == "word"}
+      )
+     )
+    (
+	(({!SpaceToken})*){Token.kind == "word"}
+	|(({!SpaceToken})*){Token.kind == "number"}
+	|(({!SpaceToken})*){Token.kind == "number"}(({!SpaceToken})*){Token.kind == "word"}
+	|(({!SpaceToken})*){Token.kind == "number"}(({!SpaceToken})*){Token.kind == "punctuation"}(({SpaceToken})?){Token.kind == "number"}(({SpaceToken})?){Token.kind == "punctuation"}(({SpaceToken})?){Token.kind == "word"}(({SpaceToken})?){Token.kind == "punctuation"}(({SpaceToken})?)({Token.kind == "word"})
+	|(({Token}{!SpaceToken})*){Token.kind == "word"}
+	|(({Token}{!SpaceToken})*){Token.kind == "number"}
+	|({Token.kind == "word"})(({Token}{!SpaceToken})*)({Token.kind == "word"})
+	|({Token.kind == "word"})(({Token}{!SpaceToken})*)({Token.kind == "word"})
+	|{Token.kind == "word"}
+    )
+  ):aggreg
+  (
+  {SpaceToken}
+  |{Token.kind == "punctuation"}{SpaceToken}
+  )
+)
+: aggrule 
+-->
+:aggrule
+{
+try{
+    gate.AnnotationSet toRemove = (gate.AnnotationSet)bindings.get("aggreg");
+    //get the tokens
+    java.util.ArrayList tokens = new java.util.ArrayList(toRemove);
+    //define a comparator for annotations by start offset
+    Collections.sort(tokens, new gate.util.OffsetComparator());
+    String text = "";
+    Iterator tokIter = tokens.iterator();
+    while(tokIter.hasNext())
+      text += (String)((Annotation)tokIter.next()).getFeatures().get("string");
+    
+    gate.FeatureMap features = Factory.newFeatureMap();
+//    features.put("kind", "word");
+    features.put("string", text);
+    features.put("length", Integer.toString(text.length()));
+    outputAS.add(toRemove.firstNode(), toRemove.lastNode(), "TokenAggregation", features);
+    
+  } catch (Exception e){
+      System.out.println("Exception in token_aggregation, TokenAggregation_rule: "+e); 
+  }        
+}

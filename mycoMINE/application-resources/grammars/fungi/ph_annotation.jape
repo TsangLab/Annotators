@@ -1,0 +1,38 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: pHSentence_annotation
+Input: Token Sentence
+Options: control = appelt
+
+Rule: pHSentence_rule
+(
+{Sentence contains {Token.string == "pH"}}
+): phsent 
+-->
+:phsent
+{
+try{
+  
+Annotation phsent_an = (Annotation)phsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", phsent_an.getStartNode().getOffset(), phsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(phsentAnnots.firstNode().getOffset(), phsentAnnots.lastNode().getOffset()).toString();
+features.put("pH_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "pH");
+
+outputAS.add(phsent_an.getStartNode(), phsent_an.getEndNode(), "pH", features);
+  } catch (Exception e){
+      System.out.println("Exception in pHSentence_annotation, pHSentence_rule: "+e); 
+  }        
+} 

@@ -1,0 +1,42 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+Phase: notanenzyme_filtration 
+Input: Token Lookup
+Options: control = appelt
+
+Rule: NotAnEnzymeFiltration_rule
+(
+   // States are not enzyme abbreviations : CA, USA / GO, Brazil  
+    ({Lookup}):urnotanenz
+    ({Token.kind == punctuation}
+     {Lookup.majorType == location}) 
+)
+: statesfilter 
+-->
+:statesfilter
+{
+ try{
+    gate.AnnotationSet toRemove = (gate.AnnotationSet)bindings.get("urnotanenz");
+    java.util.ArrayList tokens = new java.util.ArrayList(toRemove);
+    //define a comparator for annotations by start offset
+    Collections.sort(tokens, new gate.util.OffsetComparator());
+    String text = "";
+    Iterator tokIter = tokens.iterator();
+    while(tokIter.hasNext())
+      text += (String)((Annotation)tokIter.next()).getFeatures().get("string");
+    
+    //add the updated tag
+    gate.FeatureMap features = Factory.newFeatureMap();
+    features.put("majorType", "notanenzyme");    
+    features.put("rule", "NotAnEnzymeFiltration");
+    outputAS.add(toRemove.firstNode(), toRemove.lastNode(), "Lookup", features);
+
+   } catch (Exception e){
+       System.out.println("Exception in notanenzyme_filtration, NotAnEnzymeFiltration_rule: "+e); 
+   }       
+} 

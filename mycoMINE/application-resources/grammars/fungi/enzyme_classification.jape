@@ -1,0 +1,191 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+//
+// JAPE rule for:
+// - ID tag creation [SwissProt, BRENDA] 
+// - Enzyme SubClassification wrt EC Number [Peroxidase, Lipase, Glycoside Hydrolase]
+// - Enzyme = document topic
+
+Imports: {
+import static gate.Utils.*;
+}
+
+
+Phase: enzyme_classification
+Input: Enzyme
+Options: control = all
+
+Rule: enzyme_classification_annotation_rule
+(
+  {Enzyme}
+): enzidsub 
+-->
+:enzidsub
+{
+try{
+
+	//flag document as mentioning enzyme
+	doc.getFeatures().put("enzyme", "doctopic");
+
+    // gets the annotationSets and annotations for each label   
+    gate.Annotation enzidsub_an = (gate.Annotation)enzidsubAnnots.get("Enzyme").iterator().next();
+    gate.AnnotationSet enzidsub_anSet = inputAS.get("Enzyme", enzidsub_an.getStartNode().getOffset(), enzidsub_an.getEndNode().getOffset());
+
+    if(enzidsub_anSet==null) return;
+    if(enzidsub_anSet.isEmpty()) return;
+
+    //offsets
+    long begOffset = start(enzidsub_an);
+    long endOffset = end(enzidsub_an); 
+
+    // patterns for Enzyme Classification wrt EC Number
+		// Glycoside Hydrolase    
+		String glycosidehydrolase = "3.2.1.";
+    java.util.regex.Pattern glycohydropattern = java.util.regex.Pattern.compile(glycosidehydrolase);
+		// Laccase
+    String laccase = "1.10.3.2";
+    java.util.regex.Pattern lacpattern = java.util.regex.Pattern.compile(laccase);
+		// Lipase
+    String lipase = "3.1.1.3";
+    java.util.regex.Pattern lippattern = java.util.regex.Pattern.compile(lipase); 
+		// Peroxidase
+    String peroxidase = "1.11.1.";
+    java.util.regex.Pattern peroxpattern = java.util.regex.Pattern.compile(peroxidase);
+
+    // get value of enzyme_alias
+    String strOfEnzymeAlias = (String) enzidsub_an.getFeatures().get("enzyme_alias");
+    
+    //System.out.println("enzyme_alias: " + strOfEnzymeAlias + " / start: " + begOffset + " / end: " + endOffset);
+    
+    // get value of SwissProt ID feature if exists
+    // RQ: all the candidates are concatenated in one string
+    // that should be splitted and correctly matched with the EC Number candidates...
+    String strOfSwissProtID = (String) enzidsub_an.getFeatures().get("SwissProt_ID");
+
+	/* SwissProt separated annotation is useless
+    if(strOfSwissProtID != null){
+      // create FeatureMap to hold new features
+      gate.FeatureMap SwissProtiDFeatures = Factory.newFeatureMap();
+      // ExternalKnowledge mapping annotation
+      SwissProtiDFeatures.put("SwissProt_ID", strOfSwissProtID);
+      SwissProtiDFeatures.put("enzyme_alias", strOfEnzymeAlias);
+      outputAS.add( begOffset, endOffset, "SwissProt", SwissProtiDFeatures);
+    }
+	*/
+    // get value of feature from Enzyme.BRENDA_ECNumber
+    String strOfBrendaEC = (String) enzidsub_an.getFeatures().get("BRENDA_ECNumber");
+    String strOfBrendaRN = (String) enzidsub_an.getFeatures().get("BRENDA_RecommendedName");
+    String strOfBrendaSN = (String) enzidsub_an.getFeatures().get("BRENDA_SystematicName");
+    String strOfBrendaWP = (String) enzidsub_an.getFeatures().get("BRENDA_WebPage");
+    if(strOfBrendaEC != null){
+	  // create FeatureMap to hold new features
+	  gate.FeatureMap familyFeatures = Factory.newFeatureMap();
+
+	  /* BRENDA separated annotation is useless
+	  gate.FeatureMap BRENDAFeatures = Factory.newFeatureMap();
+	  
+	  // BRENDA annotation
+	  BRENDAFeatures.put("enzyme_alias", strOfEnzymeAlias);	  
+	  BRENDAFeatures.put("BRENDA_ECNumber", strOfBrendaEC);	  
+	  BRENDAFeatures.put("BRENDA_RecommendedName", strOfBrendaRN);	
+	  BRENDAFeatures.put("BRENDA_SystematicName", strOfBrendaSN);	  
+	  //String strOfBrendaWP = (String) enzidsub_an.getFeatures().get("BRENDA's page");
+	  BRENDAFeatures.put("BRENDA_WebPage", strOfBrendaWP);
+	  outputAS.add( begOffset, endOffset, "BRENDA", BRENDAFeatures);
+	  */	
+	  
+	  // Enzyme Classification by Family wrt EC Number
+	  java.util.regex.Matcher peroxmatcher = peroxpattern.matcher(strOfBrendaEC);
+	  java.util.regex.Matcher lacmatcher = lacpattern.matcher(strOfBrendaEC);
+	  java.util.regex.Matcher lipmatcher = lippattern.matcher(strOfBrendaEC);
+	  java.util.regex.Matcher glycohydromatcher = glycohydropattern.matcher(strOfBrendaEC);	  
+
+	  // Glycoside Hydrolase
+		// uses the find method which scans the input sequence looking for the next subsequence that matches the pattern.
+	  if(glycohydromatcher.find()){
+// 	    System.out.println("GH found: BRENDA_ECNumber: "+ strOfBrendaEC + " / BRENDA_RecommendedName: "+ strOfBrendaRN );
+	    familyFeatures.put("enzyme_alias", strOfEnzymeAlias);
+	    familyFeatures.put("google_search", "http://www.google.com/search?q="+strOfEnzymeAlias.replaceAll("\\ ", "+"));
+	    familyFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+strOfEnzymeAlias.replaceAll("\\ ", "_"));
+	    familyFeatures.put("BRENDA_ECNumber", strOfBrendaEC);
+	    familyFeatures.put("BRENDA_RecommendedName", strOfBrendaRN);	
+	    familyFeatures.put("BRENDA_SystematicName", strOfBrendaSN);
+	    familyFeatures.put("BRENDA_WebPage", strOfBrendaWP);
+	    familyFeatures.put("annot_type", "Enzyme,Glycoside_Hydrolase");
+	    if(strOfSwissProtID != null){
+	      familyFeatures.put("SwissProt_ID", strOfSwissProtID);
+	    }
+	    outputAS.add( begOffset, endOffset, "Glycoside_Hydrolase", familyFeatures);
+	    // if a subclass has been found, one could  remove the enzyme tag 
+// 	    inputAS.remove(enzidsub_an);
+	  }
+
+	  // Laccase
+		// Rq: uses the matches method which attempts to match the entire input sequence against the pattern.
+	  if(lacmatcher.matches()){ 
+// 	    System.out.println("Laccase found: BRENDA_ECNumber: "+ strOfBrendaEC + " / BRENDA_RecommendedName: "+ strOfBrendaRN );	    
+	    familyFeatures.put("enzyme_alias", strOfEnzymeAlias);
+	    familyFeatures.put("google_search", "http://www.google.com/search?q="+strOfEnzymeAlias.replaceAll("\\ ", "+"));
+	    familyFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+strOfEnzymeAlias.replaceAll("\\ ", "_"));
+	    familyFeatures.put("BRENDA_ECNumber", strOfBrendaEC);
+	    familyFeatures.put("BRENDA_RecommendedName", strOfBrendaRN);	
+	    familyFeatures.put("BRENDA_SystematicName", strOfBrendaSN);
+	    familyFeatures.put("BRENDA_WebPage", strOfBrendaWP);
+	    familyFeatures.put("annot_type", "Enzyme,Laccase");
+	    if(strOfSwissProtID != null){
+	      familyFeatures.put("SwissProt_ID", strOfSwissProtID);
+	    }
+	    outputAS.add( begOffset, endOffset, "Laccase", familyFeatures);
+	    // if a subclass has been found, one could remove the enzyme tag 
+// 	    inputAS.remove(enzidsub_an);
+	  }
+
+	  // Lipase
+		// uses the find method which scans the input sequence looking for the next subsequence that matches the pattern.
+	  if(lipmatcher.find()){
+// 	    System.out.println("Lipase found: BRENDA_ECNumber: "+ strOfBrendaEC + " / BRENDA_RecommendedName: "+ strOfBrendaRN );	    
+	    familyFeatures.put("enzyme_alias", strOfEnzymeAlias);
+	    familyFeatures.put("google_search", "http://www.google.com/search?q="+strOfEnzymeAlias.replaceAll("\\ ", "+"));
+	    familyFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+strOfEnzymeAlias.replaceAll("\\ ", "_"));
+	    familyFeatures.put("BRENDA_ECNumber", strOfBrendaEC);
+	    familyFeatures.put("BRENDA_RecommendedName", strOfBrendaRN);	
+	    familyFeatures.put("BRENDA_SystematicName", strOfBrendaSN);
+	    familyFeatures.put("BRENDA_WebPage", strOfBrendaWP);
+	    familyFeatures.put("annot_type", "Enzyme,Lipase");
+	    if(strOfSwissProtID != null){
+	      familyFeatures.put("SwissProt_ID", strOfSwissProtID);
+	    }
+	    outputAS.add( begOffset, endOffset, "Lipase", familyFeatures);
+	    // if a subclass has been found, one could remove the enzyme tag 
+// 	    inputAS.remove(enzidsub_an);
+	  }
+	  
+	  // Peroxidase
+		// uses the find method which scans the input sequence looking for the next subsequence that matches the pattern.
+	  if(peroxmatcher.find()){
+// 	    System.out.println("Peroxidase found: BRENDA_ECNumber: "+ strOfBrendaEC + " / BRENDA_RecommendedName: "+ strOfBrendaRN);	    
+	    familyFeatures.put("enzyme_alias", strOfEnzymeAlias);
+	    familyFeatures.put("google_search", "http://www.google.com/search?q="+strOfEnzymeAlias.replaceAll("\\ ", "+"));
+	    familyFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+strOfEnzymeAlias.replaceAll("\\ ", "_"));
+	    familyFeatures.put("BRENDA_ECNumber", strOfBrendaEC);
+	    familyFeatures.put("BRENDA_RecommendedName", strOfBrendaRN);	
+	    familyFeatures.put("BRENDA_SystematicName", strOfBrendaSN);	    
+	    familyFeatures.put("BRENDA_WebPage", strOfBrendaWP);
+	    familyFeatures.put("annot_type", "Enzyme,Peroxidase");
+	    if(strOfSwissProtID != null){
+	      familyFeatures.put("SwissProt_ID", strOfSwissProtID);
+	    }
+	    outputAS.add( begOffset, endOffset, "Peroxidase", familyFeatures);
+	    // if a subclass has been found, one could remove the enzyme tag 
+// 	    inputAS.remove(enzidsub_an);
+	  }
+
+
+    }
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_classification, enzyme_classification_annotation_rule: "+e); 
+  }        
+}

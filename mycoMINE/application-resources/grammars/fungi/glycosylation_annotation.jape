@@ -1,0 +1,38 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: glycosylationSentence_annotation
+Input: Lookup Sentence
+Options: control = appelt
+
+Rule: GlycosylationSentence_rule
+(
+{Sentence contains {Lookup.majorType=="glycosylation"}}
+): glycosent 
+-->
+:glycosent
+{
+try{
+  
+Annotation glycosent_an = (Annotation)glycosentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", glycosent_an.getStartNode().getOffset(), glycosent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(glycosentAnnots.firstNode().getOffset(),glycosentAnnots.lastNode().getOffset()).toString();
+features.put("glycosylation_alias", name);
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "Glycosylation");
+
+
+outputAS.add(glycosent_an.getStartNode(), glycosent_an.getEndNode(), "Glycosylation", features);
+  } catch (Exception e){
+      System.out.println("Exception in glycosylationSentence_annotation, GlycosylationSentence_rule: "+e); 
+  }        
+} 

@@ -1,0 +1,65 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+Phase: enzyme_annotation
+Input: Lookup EnzymeAggregationLookup EnzymeNameToken Strain AccessionNumber
+Options: control = appelt
+
+Rule: Enzyme_rule
+Priority: 5
+(
+  /*{EnzymeAggregationLookup, !Strain}
+  |{EnzymeNameToken, !Strain}
+  |({Lookup.minorType=="enzyme", !Lookup.majorType == "notanenzyme", !Lookup within EnzymeAggregationLookup, !Lookup within EnzymeNameToken, !Strain, Lookup notWithin {Lookup.majorType == dbname}})*/
+  {EnzymeAggregationLookup notWithin AccessionNumber, !Strain}
+  |{EnzymeNameToken notWithin AccessionNumber, !Strain}
+  |({Lookup.minorType=="enzyme", !Lookup.majorType == "notanenzyme", !Lookup within EnzymeAggregationLookup, !Lookup within EnzymeNameToken, !Strain, Lookup notWithin {Lookup.majorType == dbname}, Lookup notWithin AccessionNumber})
+  |({Lookup.class=~"enzyme", !Lookup.majorType == "notanenzyme", !Lookup within EnzymeAggregationLookup, !Lookup within EnzymeNameToken, !Strain, Lookup notWithin {Lookup.majorType == dbname}, Lookup notWithin AccessionNumber})
+): enz 
+-->
+:enz
+{
+try{
+
+    gate.AnnotationSet enzymeSet = (gate.AnnotationSet)bindings.get("enz");
+    gate.Annotation enzY = enzymeSet.iterator().next();
+    
+    gate.FeatureMap enzYFeats = enzY.getFeatures(); 
+//     String enzymeAlias = (String) enzYFeats.get("string");
+/*  int begOffset = enzYSet.firstNode().getOffset().intValue();  
+    int endOffset = enzYSet.lastNode().getOffset().intValue();  
+    String mydocContent = doc.getContent().toString();  
+    String matchedString = mydocContent.substring(begOffset, endOffset);*/ 
+  
+    gate.FeatureMap enzymeFeatures = Factory.newFeatureMap();
+    enzymeFeatures.putAll(enzYFeats);
+    if (!enzYFeats.containsKey("enzyme_alias")){
+      int begOffset = enzymeSet.firstNode().getOffset().intValue();  
+      int endOffset = enzymeSet.lastNode().getOffset().intValue();  
+      String docContent = doc.getContent().toString();  
+      String matchedString = docContent.substring(begOffset, endOffset);
+      enzymeFeatures.put("enzyme_alias", matchedString);
+      enzymeFeatures.put("google_search", "http://www.google.com/search?q="+matchedString.replaceAll("\\ ", "+"));
+      enzymeFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+matchedString.replaceAll("\\ ", "_"));
+	  enzymeFeatures.put("annot_type", "Enzyme");
+	  enzymeFeatures.put("class", "Enzyme");
+    }  
+//     enzymeFeatures.put("majorType", "protein");    
+//     enzymeFeatures.put("minorType", "enzyme");
+//     enzymeFeatures.put("enzyme_alias", matchedString);
+//     enzymeFeatures.put("enzyme_alias", enzymeAlias);
+//     enzymeFeatures.put("length", Integer.toString(matchedString.length()));
+//     enzymeFeatures.put("length", Integer.toString(enzymeAlias.length()));  
+    enzymeFeatures.put("rule", "Enzyme_rule");
+//     outputAS.add(enzymeSet.firstNode(), enzymeSet.lastNode(), "Protein", features);
+    outputAS.add(enzymeSet.firstNode(), enzymeSet.lastNode(), "Enzyme", enzymeFeatures);
+
+
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_annotation, Enzyme_rule: "+e); 
+  }        
+}

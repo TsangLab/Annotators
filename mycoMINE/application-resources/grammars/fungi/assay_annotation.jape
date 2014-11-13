@@ -1,0 +1,38 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: assay_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Assay_rule
+({Lookup.majorType=="assay"}): ass 
+-->
+:ass
+{
+try{
+  
+Annotation ass_an = (Annotation)assAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", ass_an.getStartNode().getOffset(), ass_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return; 
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(assAnnots.firstNode().getOffset(), assAnnots.lastNode().getOffset()).toString();
+features.put("assay_alias", name);
+features.put("assay_name", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+features.put("annot_type", "Assay");
+features.put("class", "Assay");
+outputAS.add(ass_an.getStartNode(), ass_an.getEndNode(), "Assay", features);
+  } catch (Exception e){
+      System.out.println("Exception in assay_annotation, Assay_rule: "+e); 
+  }        
+} 

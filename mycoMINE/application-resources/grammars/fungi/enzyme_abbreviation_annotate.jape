@@ -1,0 +1,32 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: enzyme_abbreviation_annotate
+Input: EnzymeAbbreviation EnzymeAbbreviationReference
+Options: control = appelt
+
+Rule: Enzyme_rule
+Priority: 5
+(
+  {EnzymeAbbreviation}
+  |{EnzymeAbbreviationReference}
+): allenzabbr 
+-->
+:allenzabbr
+{
+try{
+  
+      Annotation enzAbbreviation = allenzabbrAnnots.iterator().next(); 
+      FeatureMap features = Factory.newFeatureMap();
+      features.putAll(enzAbbreviation.getFeatures()); 
+	  features.put("rule", "Enzyme_abbreviation_annotate_rule");
+      outputAS.add( allenzabbrAnnots.firstNode(), allenzabbrAnnots.lastNode(), "Enzyme", features);
+
+
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_abbreviation_annotation, Enzyme_rule: "+e); 
+  }        
+}

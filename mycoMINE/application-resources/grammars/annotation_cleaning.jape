@@ -1,0 +1,40 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: Annotationcleaning
+Input: BioEntity BioSentence DEFAULT_TOKEN EnzymeAbbreviation EnzymeAbbreviationReference EnzymeAggregationLookup EnzymeNameToken GreekAggregation Lookup SpaceToken Split TaxonomicUnit TokenAggregation Sentence Token ExpressionL0 ExpressionL0STARTS ExpressionL0ENDS ExpressionToken
+Options: control = all
+
+Rule:RemoveIntermAnnots
+(
+{BioEntity}
+|{BioSentence}
+|{DEFAULT_TOKEN}
+|{EnzymeAbbreviation}
+|{EnzymeAbbreviationReference}
+|{EnzymeAggregationLookup}
+|{EnzymeNameToken}
+|{GreekAggregation}
+|{Lookup}
+|{SpaceToken}
+|{TaxonomicUnit}
+|{TokenAggregation}
+|{Sentence}
+|{Split}
+|{Token}
+|{ExpressionL0}
+|{ExpressionL0STARTS}
+|{ExpressionL0ENDS}
+|{ExpressionToken}
+)
+:mnh
+-->
+:mnh
+{
+ gate.AnnotationSet mnhSet = (gate.AnnotationSet)bindings.get("mnh");
+ inputAS.removeAll(mnhSet);
+}
+
+

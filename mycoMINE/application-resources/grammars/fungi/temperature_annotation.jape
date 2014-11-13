@@ -1,0 +1,37 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: temperatureSentence_annotation
+Input: Lookup Sentence
+Options: control = appelt
+
+Rule: TemperatureSentence_rule
+(
+{Sentence contains {Lookup.majorType=="temperature"}}
+): tempsent 
+-->
+:tempsent
+{
+try{
+  
+Annotation tempsent_an = (Annotation)tempsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", tempsent_an.getStartNode().getOffset(), tempsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(tempsentAnnots.firstNode().getOffset(),tempsentAnnots.lastNode().getOffset()).toString();
+features.put("temperature_alias", name);
+//features.put("annotation_level", "sentence");
+features.put("annot_type","Temperature");
+
+outputAS.add(tempsent_an.getStartNode(), tempsent_an.getEndNode(), "Temperature", features);
+  } catch (Exception e){
+      System.out.println("Exception in temperatureSentence_annotation, TemperatureSentence_rule: "+e); 
+  }        
+} 

@@ -1,0 +1,30 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: token_expression_annotation
+Input: Expression Token
+Options: control = appelt
+
+// annotates Expression sentence Tokens as ExpressionToken
+Rule: expressionToken_rule
+(
+{Token within Expression}
+): expresstok 
+-->
+:expresstok
+{
+try{
+  
+Annotation expresstok_an = (Annotation)expresstokAnnots.get("Token").iterator().next();
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features.putAll(expresstok_an.getFeatures()); 
+
+outputAS.add(expresstok_an.getStartNode(), expresstok_an.getEndNode(), "ExpressionToken", features);
+  } catch (Exception e){
+      System.out.println("Exception in token_expression_annotation, expressionToken_rule: "+e); 
+  }        
+} 

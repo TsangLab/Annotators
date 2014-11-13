@@ -1,0 +1,46 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: accessionNumber_annotation
+Input: Token Lookup
+Options: control = appelt
+
+Rule: accessionNumber_rule
+(
+	(({Lookup.majorType=="accessnumb"}|{Lookup.majorType=="dbname"})
+	  ({Token.kind=="punctuation"})?
+	  ({Token.orth=="allCaps"}|{Token.orth=="upperInitial"})
+	  ({Token.kind=="punctuation"})?
+	  ({Token.kind=="number"})
+	  ({Token.kind=="punctuation"}{Token.kind=="number"})?
+	)
+	/*|
+	(({Token.orth=="allCaps"})
+	 ({Token.kind=="punctuation"})?
+	 ({Token.kind=="number"})
+	 ({Token.kind=="punctuation"}{Token.kind=="number"})?
+	 ({Token.kind=="punctuation"})?
+	 ({Lookup.majorType=="accessnumb"}|{Lookup.majorType=="dbname"})
+	)
+	*/
+): accnum 
+-->
+:accnum
+{
+try{
+
+      	gate.AnnotationSet accnum_ans = (gate.AnnotationSet)bindings.get("accnum");
+
+	if(accnum_ans==null) return;
+	if(accnum_ans.isEmpty()) return;
+      	gate.FeatureMap features = Factory.newFeatureMap(); 
+	String name = doc.getContent().getContent(accnum_ans.firstNode().getOffset(), accnum_ans.lastNode().getOffset()).toString(); 
+      	features.put("accession_number_alias", name);
+		features.put("annot_type", "Accession_Number");
+      	outputAS.add(accnum_ans.firstNode(), accnum_ans.lastNode(), "AccessionNumber", features);
+  } catch (Exception e){
+      System.out.println("Exception in temperatureSentence_annotation, AccessionNumberSentence_rule: "+e); 
+  }        
+} 

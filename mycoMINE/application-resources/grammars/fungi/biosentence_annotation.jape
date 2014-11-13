@@ -1,0 +1,48 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: biosentence_annotation
+Input: Token Sentence Enzyme Organism Assay Buffer Gene Substrate Strain Fungus Family AccessionNumber pH Glycosylation Temperature SpecificActivity SubstrateSpecificity Kinetics ProductAnalysis ActivityAssayConditions EnzymeAbbreviation EnzymeAbbreviationReference BioEntity
+Options: control = all
+
+/* 
+BIOSENTENCE = macro to gather biosentences.
+The feature "biosentence" could also be added 
+to each corresponding sentences but using 
+these macro is more flexible for now.
+*/
+
+Macro: BIOSENTENCE
+({AccessionNumber}|
+{pH}|
+{Glycosylation}|
+{Temperature}|
+{SpecificActivity}|
+{SubstrateSpecificity}|
+{Kinetics}|
+{ProductAnalysis}|
+{ActivityAssayConditions}|
+{Sentence contains {BioEntity.class=="bio"}}
+)
+
+Rule: bioSentenceAnnotation
+(
+	(BIOSENTENCE)
+)
+:biosent
+-->
+:biosent
+{
+	try{
+		gate.AnnotationSet biosentSet = (gate.AnnotationSet)bindings.get("biosent");
+		gate.Annotation biosent_an = biosentSet.iterator().next();
+		gate.FeatureMap features = Factory.newFeatureMap();	
+		features.put("class", "biosent");
+		outputAS.add(biosent_an.getStartNode(), biosent_an.getEndNode(), "BioSentence", features);
+  } catch (Exception e){
+      System.out.println("Exception in biosentence_annotation, bioSentenceAnnotation_rule: "+e); 
+  }  
+}
+

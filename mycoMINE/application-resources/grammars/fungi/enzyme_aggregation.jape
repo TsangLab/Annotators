@@ -1,0 +1,46 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: enzyme_aggregation
+Input: Lookup TokenAggregation
+Options: control = appelt
+
+Rule: EnzymeAggregation_rule
+(
+//    {TokenAggregation contains {Lookup.minorType=="enzyme"}}
+    {TokenAggregation contains {Lookup.class=~"enzyme"}}
+)
+: enzag 
+-->
+:enzag
+{
+try{
+    
+    gate.AnnotationSet toRemove = (gate.AnnotationSet)bindings.get("enzag");
+    //get the tokens
+    java.util.ArrayList tokens = new java.util.ArrayList(toRemove);
+    //define a comparator for annotations by start offset
+    Collections.sort(tokens, new gate.util.OffsetComparator());
+    String text = "";
+    Iterator tokIter = tokens.iterator();
+    while(tokIter.hasNext())
+      text += (String)((Annotation)tokIter.next()).getFeatures().get("string");
+    
+    gate.FeatureMap features = Factory.newFeatureMap();
+    features.put("majorType", "protein");
+    features.put("minorType", "enzyme");
+    features.put("rule", "EnzymeAggregation_rule");
+    features.put("enzyme_alias", text);
+    features.put("google_search", "http://www.google.com/search?q="+text.replaceAll("\\ ", "+"));
+    features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+text.replaceAll("\\ ", "_"));
+    features.put("length", Integer.toString(text.length()));
+	features.put("annot_type", "Enzyme");
+	features.put("class", "Enzyme");
+    outputAS.add(toRemove.firstNode(), toRemove.lastNode(), "EnzymeAggregationLookup", features);
+
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_annotation, EnzymeAggregation_rule: "+e); 
+  }        
+}

@@ -1,0 +1,37 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: strain_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Strain_rule
+({Lookup.majorType=="strain"}): str 
+-->
+:str
+{
+try{
+  
+Annotation str_an = (Annotation)strAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", str_an.getStartNode().getOffset(), str_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return;
+
+
+gate.FeatureMap features = Factory.newFeatureMap();
+//features.put("kind", "strain");
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(strAnnots.firstNode().getOffset(), strAnnots.lastNode().getOffset()).toString();
+features.put("strain_alias", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+outputAS.add(str_an.getStartNode(), str_an.getEndNode(), "Strain", features);
+  } catch (Exception e){
+      System.out.println("Exception in strain_annotation, Strain_rule: "+e); 
+  }        
+} 

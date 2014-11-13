@@ -1,0 +1,132 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Imports: { 
+import java.net.*;
+}
+
+Phase: expressionSentence_annotation
+Input: Token Sentence Organism Gene Enzyme 
+Options: control = appelt
+
+// Expression of a Gene from an Organism, producing a specific Enzyme
+// Rq.: the rule also catches potential Host Organism and Regulation Enzyme(s).
+Rule: expressionSentence_rule
+
+(
+//{Sentence contains Organism, Sentence contains Enzyme, Sentence contains {Token.process == "gene_expression"}}
+	//organism+[gene|gene mention]+express
+	//organism+[enzyme|enzyme mention]+express
+	//[gene|gene mention]+[enzyme|enzyme mention]+express
+	{Sentence contains Organism, Sentence contains Gene, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains Organism, Sentence contains {Token.string =~"[Gg]ene"}, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains Organism, Sentence contains Enzyme, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains Organism, Sentence contains {Token.string =~"[Ee]nzyme"}, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains Gene, Sentence contains Enzyme, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains Gene, Sentence contains {Token.string =~"[Ee]nzyme"}, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains {Token.string =~"[Gg]ene"}, Sentence contains Enzyme, Sentence contains {Token.process == "gene_expression"}}
+	|{Sentence contains {Token.string =~"[Gg]ene"}, Sentence contains {Token.string =~"[Ee]nzyme"}, Sentence contains {Token.process == "gene_expression"}}
+): expressSent 
+-->
+:expressSent
+{
+/* print out expression sentences
+File xprsent = new File ("/home/vboxer/Expression/expression_sentences.txt");
+File xprdoc = new File ("/home/vboxer/Expression/expression_documents.txt");
+*/
+URL docSourceUrl = doc.getSourceUrl();
+try{
+
+	//flag document as mentioning gene expression
+	doc.getFeatures().put("expressionL0", "doctopic");
+
+	//get expression sentence
+	Annotation expressSent_an = (Annotation)expressSentAnnots.get("Sentence").iterator().next();
+
+	//create feature map for storing expression sentence features
+	FeatureMap features = Factory.newFeatureMap();
+	features = Factory.newFeatureMap();
+	String sentenceContent = doc.getContent().getContent(expressSentAnnots.firstNode().getOffset(), expressSentAnnots.lastNode().getOffset()).toString();
+	features.put("expression_alias", sentenceContent); 
+	//features.put("annotation_level", "sentence");
+	features.put("doc_source_url", docSourceUrl.toString());
+
+/*	try{
+		//write expression sentences into a text file for [training/expert checking]
+		PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (xprsent, true)));
+		pw.println (docSourceUrl+"\tL0\t"+sentenceContent);
+		pw.close();
+	}
+	catch (IOException exception)
+	{
+    	System.out.println ("I/O Exception while reading file : " + exception.getMessage());
+	}
+*/
+
+	//get organisms in expression sentence
+	AnnotationSet orgInExpressSent_ans = inputAS.get("Organism").getContained(expressSentAnnots.firstNode().getOffset(), expressSentAnnots.lastNode().getOffset());
+	long orgInExpressSentCount = 0;
+	String orgAlias = "ORG;";
+	for(Annotation orgInExpressSent : orgInExpressSent_ans){
+		features.put("organism_alias"+orgInExpressSentCount, orgInExpressSent.getFeatures().get("organism_alias"));
+		orgAlias += (String) orgInExpressSent.getFeatures().get("organism_alias")+";";
+		//System.out.println("organism found "+ orgInExpressSentCount);
+		orgInExpressSentCount++;
+	}
+
+	//get enzymes in expression sentence
+	AnnotationSet enzInExpressSent_ans = inputAS.get("Enzyme").getContained(expressSentAnnots.firstNode().getOffset(), expressSentAnnots.lastNode().getOffset());
+	long enzInExpressSentCount = 0;
+	String enzAlias = "ENZ;";
+	for(Annotation enzInExpressSent : enzInExpressSent_ans){
+		features.put("enzyme_alias"+enzInExpressSentCount, enzInExpressSent.getFeatures().get("enzyme_alias"));
+		enzAlias += (String) enzInExpressSent.getFeatures().get("enzyme_alias")+";";
+		//System.out.println("enzyme found "+ enzInExpressSentCount); 
+		enzInExpressSentCount++;
+	}
+
+	//get genes in expression sentence
+	AnnotationSet geneInExpressSent_ans = inputAS.get("Gene").getContained(expressSentAnnots.firstNode().getOffset(), expressSentAnnots.lastNode().getOffset());
+	long geneInExpressSentCount = 0;
+	String geneAlias = "GENE;";
+	for(Annotation geneInExpressSent : geneInExpressSent_ans){
+		features.put("gene_alias"+geneInExpressSentCount, geneInExpressSent.getFeatures().get("gene_alias"));
+		geneAlias += (String) geneInExpressSent.getFeatures().get("gene_alias")+";";
+		//System.out.println("gene found "+ geneInExpressSentCount); 
+		geneInExpressSentCount++;
+	}
+
+	//annotate Expression sentence 
+	outputAS.add(expressSent_an.getStartNode(), expressSent_an.getEndNode(), "Expression", features);
+
+	//annotate Expression sentence [at level 0] 
+	outputAS.add(expressSent_an.getStartNode(), expressSent_an.getEndNode(), "ExpressionL0", features);
+
+	//annotate Expression sentence [at level 0] STARTS and ENDS 
+	outputAS.add(expressSent_an.getStartNode().getOffset(), expressSent_an.getStartNode().getOffset()+1, "ExpressionL0STARTS", features);
+	outputAS.add(expressSent_an.getEndNode().getOffset()-1, expressSent_an.getEndNode().getOffset(), "ExpressionL0ENDS", features);
+
+	//write details for evaluation against mycoCLAP
+	/*try{
+		//write expression sentences into a text file for [training/expert checking]
+		PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (xprsent, true)));
+		pw.println (docSourceUrl+"\tL0\t"+sentenceContent);	//sentence content
+		//pw.println (docSourceUrl+"\tL0\t"+sentenceContent+"\t"+orgAlias);	//sentence content + entities
+		//pw.println (docSourceUrl+"\tL0"+"\t"+orgAlias+"\t"+enzAlias+"\t"+geneAlias);	//entities
+		pw.close();
+		//write list of docs including L0 expression sentence
+		PrintWriter xprdoclst = new PrintWriter (new BufferedWriter (new FileWriter (xprdoc, true)));
+		xprdoclst.println (docSourceUrl);
+		xprdoclst.close();
+	}
+	catch (IOException exception)
+	{
+    	System.out.println ("I/O Exception while reading file : " + exception.getMessage());
+	}
+	*/
+  } catch (Exception e){
+      System.out.println("Exception in expressionSentence_annotation, expressionSentence_rule: "+e); 
+  }        
+} 

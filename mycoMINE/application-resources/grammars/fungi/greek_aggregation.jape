@@ -1,0 +1,47 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+// JAPE rule for annotation of a string including no space as a complete entity if it contains a greekletter 
+Imports: {
+import static gate.Utils.*;
+}
+
+Phase: greek_aggregation 
+Input: Lookup SpaceToken Token
+Options: control = all
+
+Rule: greekAggreg
+({SpaceToken}):left
+(
+{Lookup.majorType == "greekletter"}
+// match only a char: switch to {Lookup.minorType == "greekletterchar"} 
+// match only the name of a greekletter: switch to {Lookup.minorType == "greeklettername"} 
+):lookupType
+({SpaceToken}):right
+-->
+{
+  try{
+      Node start = ((AnnotationSet) bindings.get("left")).lastNode();
+      Node end   = ((AnnotationSet) bindings.get("right")).firstNode();
+       
+      long startOffset = start.getOffset();
+      long endOffset = end.getOffset(); 
+
+      gate.AnnotationSet lookupTypeSet = (gate.AnnotationSet)bindings.get("lookupType");
+      Annotation lookupTypeAnn = lookupTypeSet.iterator().next(); 
+      String letter = doc.getContent().getContent(lookupTypeAnn.getStartNode().getOffset(),lookupTypeAnn.getEndNode().getOffset()).toString();
+
+      FeatureMap features = Factory.newFeatureMap();
+      features.putAll(lookupTypeAnn.getFeatures()); 
+      // add the string as the value of the feature "string"
+      features.put("greek_letter", letter);
+      features.put("start_offset", startOffset);
+      features.put("end_offset", endOffset);
+      features.put("rule", "greekAggreg");
+      outputAS.add(start, end, "tempGreekAggreg", features);
+    }catch (Exception e){
+      System.out.println("Exception in greek_aggregation, greekAggreg_rule: "+e); 
+    }
+}

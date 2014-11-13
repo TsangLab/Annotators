@@ -1,0 +1,12 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+MultiPhase:  FalsePositiveFiltration
+Phases:
+bioentity_annotation
+biosentence_annotation
+falsepositive_filtration

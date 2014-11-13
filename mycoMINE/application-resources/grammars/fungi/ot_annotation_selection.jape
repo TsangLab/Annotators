@@ -1,0 +1,128 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+// JAPE rule for Organism Tagger annotation and feature selection                                                                                                                         
+Imports: {
+import static gate.Utils.*;
+}
+
+
+Phase: re_used_from_OT
+Input: acronym Organism TaxonomicUnit genus learnedStrain possibleStrain species stopList strain subspecies
+Options: control = all
+
+Rule: re_used_from_Organism
+(
+  {Organism}
+):org 
+-->
+:org
+{
+try{
+    // gets the annotationSets and annotations for each label   
+    gate.Annotation org_an = (gate.Annotation)orgAnnots.get("Organism").iterator().next();
+    gate.AnnotationSet org_anSet = inputAS.get("Organism", org_an.getStartNode().getOffset(), org_an.getEndNode().getOffset());
+
+    if(org_anSet==null) return;
+    if(org_anSet.isEmpty()) return;
+    long begOffset = start(org_an);
+    long endOffset = end(org_an);
+    // remove the "old" Organism tag
+    outputAS.removeAll(org_anSet);
+    // get the organism features
+    gate.FeatureMap organismFeatures = Factory.newFeatureMap();
+    organismFeatures.putAll(org_an.getFeatures());
+    // remove the useless features
+    organismFeatures.remove("Rule");
+    //organismFeatures.remove("class");
+    organismFeatures.remove("instanceName");
+    organismFeatures.remove("organismName");
+    organismFeatures.remove("Found");
+    organismFeatures.remove("abbrGenus");
+    // get value of feature from Organism.ncbiId
+    String strOfncbiId = (String) org_an.getFeatures().get("ncbiId");
+    organismFeatures.remove("ncbiId");
+    if(strOfncbiId != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("NCBI_Taxonomy_ID",strOfncbiId);
+    }
+    String organism_alias = (String) org_an.getFeatures().get("docName");
+    organismFeatures.remove("docName");
+    if(organism_alias != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("organism_alias",organism_alias);
+    }  
+    String organism_scientific_name = (String) org_an.getFeatures().get("scientificName");
+    organismFeatures.remove("scientificName");
+    if(organism_scientific_name != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("organism_scientific_name",organism_scientific_name);
+      organismFeatures.put("google_search", "http://www.google.com/search?q="+organism_scientific_name.replaceAll("\\ ", "+"));
+      organismFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+organism_scientific_name.replaceAll("\\ ", "_"));
+     } 
+    String organism_genus = (String) org_an.getFeatures().get("Genus");
+    organismFeatures.remove("Genus");
+    if(organism_genus != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("organism_genus",organism_genus);
+    }
+    String organism_species = (String) org_an.getFeatures().get("Species");
+    organismFeatures.remove("Species");
+    if(organism_species != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("organism_species",organism_species);
+    }
+    String organism_strain = (String) org_an.getFeatures().get("Strain");
+    organismFeatures.remove("Strain");
+    if(organism_strain != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("organism_strain",organism_strain);
+    }
+    String ncbi_taxonomy_webpage = (String) org_an.getFeatures().get("url");
+    organismFeatures.remove("url");
+    if(ncbi_taxonomy_webpage != null){
+      // rename organism feature for ontology population (owlExporter)
+      organismFeatures.put("NCBI_Taxonomy_WebPage",ncbi_taxonomy_webpage);
+     }
+	// add a type feature for CSFGBro sidebar hierarchy
+	organismFeatures.put("annot_type","Organism");
+
+	//add the updated Organism tag
+    outputAS.add( begOffset, endOffset, "Organism", organismFeatures);
+    
+  } catch (Exception e){
+      System.out.println("Exception in re_used_from_OT, re_used_from_Organism_rule: "+e); 
+  }        
+}
+
+Rule: remove_not_used_tag
+(
+//  {TaxonomicUnit}|
+  {genus}|
+  {learnedStrain}|
+  {possibleStrain}|
+  {strain}|
+  {species}|
+  {subspecies}|  
+  {stopList}|
+  {acronym}
+  
+):notusedtag 
+-->
+:notusedtag
+{
+  try{  
+    // gets the annotationSets and annotations for each label   
+    gate.AnnotationSet notusedtag_anSet = (gate.AnnotationSet) bindings.get("notusedtag");
+    gate.Annotation notusedtag_an = (gate.Annotation)notusedtag_anSet.iterator().next();
+
+    
+    if((notusedtag_anSet==null) || (notusedtag_anSet.isEmpty())) return;
+    // remove the not used tag
+    inputAS.remove(notusedtag_an);
+  } catch (Exception e){
+      System.out.println("Exception in re_used_from_OT, remove_not_used_tag_rule: "+e); 
+  }        
+}

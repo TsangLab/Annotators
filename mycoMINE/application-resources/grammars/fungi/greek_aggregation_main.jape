@@ -1,0 +1,9 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+MultiPhase: greek_main
+Phases:
+greek_aggregation
+greek_minimal_offset

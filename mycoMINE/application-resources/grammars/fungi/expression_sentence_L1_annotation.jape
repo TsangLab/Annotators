@@ -1,0 +1,104 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Imports: { 
+import java.net.*;
+}
+
+Phase: expressionSentence_L1_annotation
+Input: Token Sentence Organism Enzyme 
+Options: control = appelt
+
+// Expression of a Gene from an Organism, producing a specific Enzyme
+// Rq.: the rule also catches potential Host Organism and Regulation Enzyme(s).
+Rule: expressionSentence_L1_rule
+
+(
+	//organism+[enzyme|enzyme mention]+[Token.string =~"[Pp]roduc"]
+	{Sentence contains Organism, Sentence contains Enzyme, Sentence contains {Token.string =~ "[Pp]roduc"}}
+	|{Sentence contains Organism, Sentence contains {Token.string =~"[Ee]nzyme"}, Sentence contains {Token.string =~ "[Pp]roduc"}}
+): expressSentL1 
+-->
+:expressSentL1
+{
+/*print out expression L1 sentences
+File xprsent = new File ("/home/vboxer/Expression/expression_sentences.txt");
+*/
+URL docSourceUrl = doc.getSourceUrl();
+try{
+	//check if the doc contains expression sentences at level 0
+	if(doc.getFeatures().containsKey("expressionL0")){	
+		//get expression sentence
+		Annotation expressSentL1_an = (Annotation)expressSentL1Annots.get("Sentence").iterator().next();
+	
+		//create feature map for storing expression sentence L1 features
+		FeatureMap features = Factory.newFeatureMap();
+		features = Factory.newFeatureMap();
+		String sentenceContent = doc.getContent().getContent(expressSentL1Annots.firstNode().getOffset(), expressSentL1Annots.lastNode().getOffset()).toString();
+		features.put("expression_L1_alias", sentenceContent); 
+		//features.put("annotation_level", "sentence");
+
+/*		try{
+			//write expression sentences into a text file for [training/expert checking]
+			PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (xprsent, true)));
+			pw.println (docSourceUrl+"\tL1\t"+sentenceContent);
+			pw.close();
+		}
+		catch (IOException exception)
+		{
+    		System.out.println ("I/O Exception while reading file : " + exception.getMessage());
+		}
+*/
+
+		//get organisms in expression sentence L1
+		AnnotationSet orgInExpressSentL1_ans = inputAS.get("Organism").getContained(expressSentL1Annots.firstNode().getOffset(), expressSentL1Annots.lastNode().getOffset());
+		long orgInExpressSentL1Count = 0;
+		String orgAlias = "ORGL1;";
+		for(Annotation orgInExpressSentL1 : orgInExpressSentL1_ans){
+			features.put("organism_alias"+orgInExpressSentL1Count, orgInExpressSentL1.getFeatures().get("organism_alias"));
+			orgAlias += (String) orgInExpressSentL1.getFeatures().get("organism_alias")+";";
+			//System.out.println("organism found "+ orgInExpressSentL1Count);
+			orgInExpressSentL1Count++;
+		}
+
+		//get enzymes in expression sentence
+		AnnotationSet enzInExpressSentL1_ans = inputAS.get("Enzyme").getContained(expressSentL1Annots.firstNode().getOffset(), expressSentL1Annots.lastNode().getOffset());
+		long enzInExpressSentL1Count = 0;
+		String enzAlias = "ENZL1;";
+		for(Annotation enzInExpressSentL1 : enzInExpressSentL1_ans){
+			features.put("enzyme_alias"+enzInExpressSentL1Count, enzInExpressSentL1.getFeatures().get("enzyme_alias"));
+			enzAlias += (String) enzInExpressSentL1.getFeatures().get("enzyme_alias")+";";
+			//System.out.println("enzyme found "+ enzInExpressSentL1Count); 
+			enzInExpressSentL1Count++;
+		}
+
+		//flag document as mentioning gene expression
+		doc.getFeatures().put("expressionL1", "doctopic");
+
+		//annotate Expression sentence 
+		outputAS.add(expressSentL1_an.getStartNode(), expressSentL1_an.getEndNode(), "Expression", features);
+
+		//annotate Expression sentence [at level 1] 
+		outputAS.add(expressSentL1_an.getStartNode(), expressSentL1_an.getEndNode(), "ExpressionL1", features);
+
+		//write details for evaluation against mycoCLAP
+		/*
+		try{
+			//write expression sentences into a text file for [training/expert checking]
+			PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (xprsent, true)));
+			pw.println (docSourceUrl+"\tL1\t"+sentenceContent);	//sentence content
+			//pw.println (docSourceUrl+"\tL1"+"\t"+orgAlias+"\t"+enzAlias);	//entities
+			pw.close();
+		}
+		catch (IOException exception)
+		{
+    		System.out.println ("I/O Exception while reading file : " + exception.getMessage());
+		}
+		*/
+	}
+  } catch (Exception e){
+      System.out.println("Exception in expressionSentenceL1_annotation, expressionSentenceL1_rule: "+e); 
+  }        
+} 

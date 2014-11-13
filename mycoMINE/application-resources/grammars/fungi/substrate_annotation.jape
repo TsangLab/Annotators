@@ -1,0 +1,37 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: substrate_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Substrate_rule1
+({Lookup.majorType=="substrate"}): subst 
+-->
+:subst
+{
+try{
+  
+Annotation subst_an = (Annotation)substAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", subst_an.getStartNode().getOffset(), subst_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(substAnnots.firstNode().getOffset(), substAnnots.lastNode().getOffset()).toString();
+features.put("substrate_alias", name);
+features.put("substrate_name", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+features.put("class", "Substrate");
+features.put("annot_type", "Substrate");
+outputAS.add(subst_an.getStartNode(), subst_an.getEndNode(), "Substrate", features);
+  } catch (Exception e){
+      System.out.println("Exception in substrate_annotation, Substrate_rule1: "+e); 
+  }        
+} 

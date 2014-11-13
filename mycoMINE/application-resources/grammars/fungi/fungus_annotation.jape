@@ -1,0 +1,76 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: fungus_annotation
+
+Input: Lookup Organism
+Options: control = appelt
+
+Rule: Fungus_rule1
+(
+{Organism, Lookup.minorType=="fungus"}
+|{Organism, Lookup.minorType=="mycoclapfungus"}
+|{Organism, Lookup.minorType=="alternatenamefungus"}
+|{Organism, Lookup.minorType=="acronymfungus"}
+): fung
+-->
+:fung
+{
+try{
+   
+ Annotation fung_an = (Annotation)fungAnnots.get("Organism").iterator().next();
+ AnnotationSet  fung_ans= inputAS.get("Organism", fung_an.getStartNode().getOffset(), fung_an.getEndNode().getOffset());
+ 
+
+ //flag document as mentioning fungus
+ doc.getFeatures().put("fungus", "doctopic");
+
+ // get the organism features
+ gate.FeatureMap fungusFeatures = Factory.newFeatureMap();
+ fungusFeatures.putAll(fung_an.getFeatures()); 
+ fungusFeatures.put("annot_type", "Organism,Fungus");
+// fungusFeatures.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+// fungusFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+ fungusFeatures.put("class", "Fungus");
+// outputAS.add(fung_an.getStartNode(), fung_an.getEndNode(), "Organism", features);
+ outputAS.add(fung_an.getStartNode(), fung_an.getEndNode(), "Fungus", fungusFeatures);
+   } catch (Exception e){
+       System.out.println("Exception in fungus_annotation, Fungus_rule1: "+e); 
+   }        
+} 
+
+//-------------//
+
+Rule: Fungus_rule2
+(
+{!Organism, Lookup.minorType=="fungus"}
+): fungnotorg
+-->
+:fungnotorg
+{
+try{
+   
+ Annotation fungnotorg_an = (Annotation)fungnotorgAnnots.get("Lookup").iterator().next();
+ AnnotationSet  Lookup_ans= inputAS.get("Lookup", fungnotorg_an.getStartNode().getOffset(), fungnotorg_an.getEndNode().getOffset());
+
+ //flag document as mentioning fungus
+ doc.getFeatures().put("fungus", "doctopic");
+
+ // get the Lookup features
+ gate.FeatureMap fungusFeatures = Factory.newFeatureMap();
+ fungusFeatures.putAll(fungnotorg_an.getFeatures()); 
+ String name = doc.getContent().getContent(fungnotorgAnnots.firstNode().getOffset(), fungnotorgAnnots.lastNode().getOffset()).toString();
+ fungusFeatures.put("organism_alias", name);
+ fungusFeatures.put("annot_type", "Organism,Fungus");
+ fungusFeatures.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+ fungusFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+ fungusFeatures.put("class", "Fungus");
+// outputAS.add(fung_an.getStartNode(), fung_an.getEndNode(), "Organism", features);
+ outputAS.add(fungnotorg_an.getStartNode(), fungnotorg_an.getEndNode(), "Fungus", fungusFeatures);
+   } catch (Exception e){
+       System.out.println("Exception in fungus_annotation, Fungus_rule2: "+e); 
+   }        
+} 
+

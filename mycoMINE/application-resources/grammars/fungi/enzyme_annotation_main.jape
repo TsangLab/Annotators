@@ -1,0 +1,16 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+MultiPhase:     Enzyme
+Phases:
+notanenzyme_filtration 
+enzyme_aggregation
+enzyme_nomenclature
+enzyme_annotation
+enzyme_abbreviation_find
+enzyme_abbreviation_apply
+enzyme_abbreviation_annotate

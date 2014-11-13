@@ -1,0 +1,788 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!-- ENTITY p2 "file:/nlp.owl#" -->
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY swrl "http://www.w3.org/2003/11/swrl#" >
+    <!ENTITY swrlb "http://www.w3.org/2003/11/swrlb#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY protege "http://protege.stanford.edu/plugins/owl/protege#" >
+    <!ENTITY xsp "http://www.owl-ontologies.com/2005/08/07/xsp.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.fungalgenomics.ca/ontologies/genozymes.owl#"
+     xml:base="http://www.fungalgenomics.ca/ontologies/genozymes.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+     xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+     <!--xmlns:p2="file:/nlp.owl#"-->
+    <owl:Ontology rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl">
+        <rdfs:comment rdf:datatype="&xsd;string">The Genozymes ontology describes the objects and relationships involved in the study of fungal enzymes for the lignocellulose research.</rdfs:comment>
+        <!--owl:imports rdf:resource="file:/nlp.owl"/ -->
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#appearsIn 
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#appearsIn">
+        <rdfs:range rdf:resource="&p2;Sentence"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ActivityAssayConditions"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+	-->
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#belongs_to_organism -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#belongs_to_organism">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#contains_gene"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#carries_out -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#carries_out">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_carried_out_by"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#contains_gene -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#contains_gene">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#encodes -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#encodes">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#has_activity_towards -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#has_activity_towards">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_activated_by"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_activated_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_activated_by">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_carried_out_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_carried_out_by">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_expressed_in -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_expressed_in">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_expressing -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_expressing">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_expressed_in"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_host_of -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_host_of">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Host"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_hosted_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_hosted_by">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_host_of"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_reported_in -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_reported_in">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Glycoside_Hydrolase"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_used_in -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_used_in">
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_using"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_using -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_using">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:range rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#reports_on -->
+
+    <owl:ObjectProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#reports_on">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:inverseOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#is_reported_in"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Glycoside_Hydrolase"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_ECNumber -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_ECNumber">
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_RecommendedName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_RecommendedName">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_SystematicName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_SystematicName">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_WebPage -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA_WebPage">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy_ID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy_ID">
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy_WebPage -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy_WebPage">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt_ID -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt_ID">
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+                    <rdf:Description rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#assay_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#assay_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#assay_name -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#assay_name">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#buffer_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#buffer_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#buffer_name -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#buffer_name">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#enzyme_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#enzyme_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#gene_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#gene_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_alias">
+        <rdfs:comment rdf:datatype="&xsd;string">the organism alias found in the document</rdfs:comment>
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_genus -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_genus">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_scientific_name -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_scientific_name">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_species -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_species">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_strain -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#organism_strain">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#substrate_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#substrate_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#substrate_name -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#substrate_name">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#temperature_alias -->
+
+    <owl:DatatypeProperty rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#temperature_alias">
+        <rdfs:domain rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#ActivityAssayConditions -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ActivityAssayConditions">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Assay">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#BRENDA">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt"/>
+        <rdfs:comment rdf:datatype="&xsd;string">BRENDA The Comprehensive Enzyme Information System [http://www.brenda-enzymes.org]</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Buffer">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Fungus -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Fungus">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Gene">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Glycoside_Hydrolase -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Glycoside_Hydrolase">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Laccase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase"/>
+        <rdfs:comment rdf:datatype="&xsd;string">EC Number 3.2.1.x</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Host -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Host">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#KineticAssayConditions">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Laccase -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Laccase">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase"/>
+        <rdfs:comment rdf:datatype="&xsd;string">EC Number 1.10.3.2</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Lipase">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase"/>
+        <rdfs:comment rdf:datatype="&xsd;string">EC Number 3.1.1.3x</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#NCBI_Taxonomy">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt"/>
+        <rdfs:comment rdf:datatype="&xsd;string">The NCBI Taxonomy [http://www.ncbi.nlm.nih.gov/Taxonomy/]</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Organism">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+        <rdfs:comment rdf:datatype="&xsd;string">missing subclasses wrt NCBI taxonomy: Organism-&gt;Eukaryota-&gt;Opisthokonta-&gt;Fungi</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Peroxidase">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Enzyme"/>
+        <rdfs:comment rdf:datatype="&xsd;string">EC Number 1.11.1.x</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SpecificActivity">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Substrate">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SubstrateSpecificity">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#SwissProt">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#ExternalKnowledgeBase"/>
+        <rdfs:comment rdf:datatype="&xsd;string">The protein knowledgebase Swiss-Prot is manually annotated and reviewed. [http://www.uniprot.org/]</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature">
+        <owl:disjointWith rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#TemperatureOptimum -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#TemperatureOptimum">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#TemperatureStability -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#TemperatureStability">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#Temperature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#pHOptimum -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pHOptimum">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.fungalgenomics.ca/ontologies/genozymes.owl#pHStability -->
+
+    <owl:Class rdf:about="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pHStability">
+        <rdfs:subClassOf rdf:resource="http://www.fungalgenomics.ca/ontologies/genozymes.owl#pH"/>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.3.1824) http://owlapi.sourceforge.net -->
+

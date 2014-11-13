@@ -1,0 +1,73 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: enzyme_abbreviation_apply 
+Input: Token Lookup Enzyme EnzymeAbbreviation EnzymeAggregationLookup
+//Options: control = appelt
+Options: control = all
+
+Rule: EnzymeAbbreviationApply_rule
+(
+  // Compare the untagged tokens with the enzyme abbreviations found in the doc by enzyme_abbreviation_find 
+//   {Token.kind == "word", !Lookup, !Enzyme, !EnzymeAbbreviation}
+  {Token.kind == "word", !EnzymeAbbreviation, !Lookup.majorType == "notanenzyme"}
+  |{Enzyme, !EnzymeAggregationLookup}
+)
+: abbrcand 
+-->
+:abbrcand
+{
+try{
+    // get the abbreviated enzyme candidates
+    gate.AnnotationSet abbrCandidateSet = (gate.AnnotationSet)bindings.get("abbrcand");
+    gate.Annotation abbrCandidate = abbrCandidateSet.iterator().next();
+    // get the abbreviated enzyme candidat features
+    FeatureMap abbrCandidateFeatures  = abbrCandidate.getFeatures();
+    String textAbbrCand = "";
+    Boolean abbrAlreadyTagEnz = false;
+    
+    if (abbrCandidateFeatures.containsKey("string")){
+      textAbbrCand = (String)abbrCandidateFeatures.get("string");
+    }
+    if (abbrCandidateFeatures.containsKey("enzyme_alias")){
+      textAbbrCand = (String)abbrCandidateFeatures.get("enzyme_alias");
+      abbrAlreadyTagEnz = true;
+
+    }    
+         
+    gate.AnnotationSet allEnzAbbr = doc.getAnnotations().get("EnzymeAbbreviation");
+    if ( allEnzAbbr == null ) {
+	System.out.println("No EnzymeAbbreviation found in this document.");
+	return;
+    }
+    for(Iterator allEnzAbbrIt = allEnzAbbr.iterator(); allEnzAbbrIt.hasNext(); ) {
+      
+      gate.Annotation enzAbbr = (Annotation)allEnzAbbrIt.next();
+      gate.FeatureMap enzAbbrFeats = enzAbbr.getFeatures();     
+
+      String aliasAbbr = (String)enzAbbrFeats.get("abbreviation_alias");
+      java.util.regex.Pattern patternAbbr = java.util.regex.Pattern.compile(aliasAbbr);
+      java.util.regex.Matcher matcherAbbr = patternAbbr.matcher(textAbbrCand);
+      if(matcherAbbr.matches()){
+// 	  System.out.println("EnzymeAbbreviation is " + aliasAbbr);
+	  
+	  gate.FeatureMap features = Factory.newFeatureMap();
+	  features.putAll(enzAbbrFeats);
+	  features.put("abbreviation_alias", textAbbrCand);
+	  features.put("style", "nonStandardAbbreviation");
+	  features.put("rule", "EnzymeAbbreviationApply");
+	  features.put("annot_type", "Enzyme");
+	  features.put("class", "Enzyme");
+	  outputAS.add(abbrCandidateSet.firstNode(), abbrCandidateSet.lastNode(), "EnzymeAbbreviationReference", features);
+	  // remove the Enzyme tag if exists
+		//gate.Annotation abbrcand_an = (gate.Annotation)abbrcandAnnots.get("Enzyme").iterator().next();
+  	//inputAS.remove(abbrcand_an);
+    }
+   } 
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_abbreviation, EnzymeAbbreviation_rule: "+e); 
+  }       
+}

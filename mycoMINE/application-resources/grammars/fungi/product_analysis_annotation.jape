@@ -1,0 +1,38 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: productAnalysisSentence_annotation
+Input: Lookup Sentence
+Options: control = appelt
+
+Rule: productAnalysisSentence_rule
+(
+{Sentence contains {Lookup.majorType == "productanalysis"}}
+): prodansent 
+-->
+:prodansent
+{
+try{
+  
+Annotation prodansent_an = (Annotation)prodansentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", prodansent_an.getStartNode().getOffset(), prodansent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(prodansentAnnots.firstNode().getOffset(), prodansentAnnots.lastNode().getOffset()).toString();
+features.put("substrate_specificity_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type","Product_Analysis");
+
+outputAS.add(prodansent_an.getStartNode(), prodansent_an.getEndNode(), "ProductAnalysis", features);
+  } catch (Exception e){
+      System.out.println("Exception in product_analysis_annotation, productAnalysisSentence_rule: "+e); 
+  }        
+} 

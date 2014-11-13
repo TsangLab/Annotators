@@ -1,0 +1,56 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: link_brenda_enzyme_annotation
+Input: Enzyme
+Options: control = appelt
+
+Rule: BRENDA_link_Enzyme_rule
+(
+  {Enzyme}
+): brendaEC 
+-->
+:brendaEC
+{
+ try{
+    // gets the annotationSets and annotations for each label   
+    gate.Annotation brendaEC_an = (gate.Annotation)brendaECAnnots.get("Enzyme").iterator().next();
+    gate.AnnotationSet  brendaEC_anSet = inputAS.get("Enzyme", brendaEC_an.getStartNode().getOffset(), brendaEC_an.getEndNode().getOffset());
+
+    if(brendaEC_anSet==null) return;
+    if(brendaEC_anSet.isEmpty()) return;
+    
+    //offsets
+    long begOffset = brendaEC_an.getStartNode().getOffset();
+    long endOffset = brendaEC_an.getEndNode().getOffset();
+
+    // get the enzyme features
+    FeatureMap enzymeFeatures  = brendaEC_an.getFeatures();
+    
+    // get value of feature from Enzyme.BRENDA_ECNumber
+    String strOfBrendaEC = (String) brendaEC_an.getFeatures().get("BRENDA_ECNumber");
+//     System.out.println("strOfBrendaEC " + strOfBrendaEC);
+    String[] brendaECList = null;
+    String splitPattern = " / or / ";
+    if(strOfBrendaEC != null){
+      brendaECList = strOfBrendaEC.split(splitPattern);
+      for(int i = 0; i < brendaECList.length; i++) {
+      gate.FeatureMap protSplitFeatures = Factory.newFeatureMap();
+
+      protSplitFeatures.putAll(enzymeFeatures);
+      protSplitFeatures.put("BRENDA_ECNumber", brendaECList[i]);
+      protSplitFeatures.put("BRENDA_WebPage", "http://www.brenda-enzymes.org/php/result_flat.php4?ecno=" + brendaECList[i] );
+      protSplitFeatures.put("rule4link", "BRENDA_link_Enzyme_rule");
+      // add new enzyme tag
+      outputAS.add(begOffset, endOffset, "Enzyme", protSplitFeatures);
+      }
+      //remove old enzyme tag
+      inputAS.removeAll(brendaEC_anSet);      
+    }
+   } catch (Exception e){
+       System.out.println("Exception in enzyme_annotation, BRENDA_link_Enzyme_rule: "+e); 
+   }        
+}

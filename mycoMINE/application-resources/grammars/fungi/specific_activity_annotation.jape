@@ -1,0 +1,51 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: specificActivitySentence_annotation
+//Input: Lookup Sentence
+Input: Token Sentence Enzyme
+Options: control = appelt
+
+Rule: specificActivitySentence_rule
+(
+//01.31.2013
+// get specific activity tokens to catch this topic in the doc (abstract)
+//{Sentence contains {Lookup.majorType == "specificactivity"}}
+{Sentence contains {Token.string =~"[Ss]pecific activit"}}
+|{Sentence contains {Token.string =~"U/m*g"}}
+|{Sentence contains {Token.string =~"[Uu]nits/mg"}}
+//|{Sentence contains {Token.string =~"[Uu]nits\.* *m*g\(*-1\)*"}}
+//|{Sentence contains {Token.string =~"U\.* *m*g\(*-1\)*"}}
+|{Sentence contains Enzyme, Sentence contains {Token.string =~"[Aa]ctivit"}}
+): specactsent 
+-->
+:specactsent
+{
+try{
+
+//flag document as mentioning specific Activity
+doc.getFeatures().put("specificActivity", "doctopic");
+
+  
+Annotation specactsent_an = (Annotation)specactsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", specactsent_an.getStartNode().getOffset(), specactsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(specactsentAnnots.firstNode().getOffset(), specactsentAnnots.lastNode().getOffset()).toString();
+features.put("specific_activity_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "Specific_Activity");
+
+outputAS.add(specactsent_an.getStartNode(), specactsent_an.getEndNode(), "SpecificActivity", features);
+  } catch (Exception e){
+      System.out.println("Exception in specific_activity_annotation, specificActivitySentence_rule: "+e); 
+  }        
+} 

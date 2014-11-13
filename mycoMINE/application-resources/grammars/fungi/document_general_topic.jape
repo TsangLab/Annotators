@@ -1,0 +1,31 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: docgentopic_extraction
+Input: Token
+Options: control = once
+
+
+// add general topic as document features
+//rule1: if "characteri* + fungus topic + enzyme topic then characterization topic
+Rule: docgentopic_rule
+(
+{Token.string=~"[Cc]haracteri"}
+): docgentopic 
+-->
+:docgentopic.Characterization = {annot_type = "Characterization", characterization_alias = :docgentopic@string, kind = "doctopic"}, 
+{
+try{
+	//get document by topic
+	boolean fungdoc = doc.getFeatures().containsKey("fungus");
+	boolean enzdoc = doc.getFeatures().containsKey("enzyme");
+	if(fungdoc && enzdoc){
+		//flag document as mentioning substrate Specificity
+		doc.getFeatures().put("characterization", "doctopic");
+	}
+  } catch (Exception e){
+      System.out.println("Exception in docgentopic_extraction, docgentopic_rule: "+e); 
+  }        
+} 

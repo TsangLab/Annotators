@@ -1,0 +1,99 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+//
+// This JAPE rule counts the number of occurences  
+// for each substrate by substrate_alias.
+//
+
+Imports: {
+import static gate.Utils.*;
+}
+
+Phase: substrate_count
+Input: Substrate
+Options: control = once
+
+Rule: substrate_count_rule
+(
+  {Substrate}
+): substratecount
+-->
+:substratecount
+{
+  try{
+    // get all the substrates in the current document
+    gate.AnnotationSet allSub = doc.getAnnotations().get("Substrate");
+    if ( allSub == null ) {
+      System.out.println("No Substrate found in this document.");
+    return;
+    } 
+    else {
+    	// store the sorted substrate annotation list to later find the first match of the most frequent substrate
+    	List<Annotation> sortedListofAllSubstrates = gate.Utils.inDocumentOrder(allSub);       
+      
+			Map<String, Integer> countBySubstrateAliasMap = new TreeMap<String, Integer>();
+
+      for(Iterator allSubIt = allSub.iterator(); allSubIt.hasNext(); ) {
+				gate.Annotation subS = (Annotation)allSubIt.next();
+				gate.FeatureMap subSFeats = subS.getFeatures();
+				if (subSFeats.containsKey("substrate_alias")){
+	  			String subAlias = (String)subSFeats.get("substrate_alias");
+	  			Integer count = (Integer) countBySubstrateAliasMap.get(subAlias);
+	  			if (count == null) {
+	    			countBySubstrateAliasMap.put(subAlias, 1);
+	  			} else {
+	    			countBySubstrateAliasMap.put(subAlias, count + 1);
+	  			}
+				}
+      }
+      //System.out.println("-------- DISTINCT SUBSTRATES [ " + countBySubstrateAliasMap.size() + " ] --------");
+	  	String winnerAlias = null;
+	  	Integer winnerAliasOccurences = 0;
+	  	Integer linejumpAlias = 0; 
+      for (Map.Entry entry : countBySubstrateAliasMap.entrySet()) {
+			//linejumpAlias++;
+			//System.out.print( entry.getKey() + " [ " + entry.getValue() + " ]\t");
+			//if(linejumpAlias == 4){
+			//	System.out.println();
+			//	linejumpAlias = 0;
+			//}
+					if ((Integer)entry.getValue() > winnerAliasOccurences) {
+						winnerAlias = (String)entry.getKey();
+						winnerAliasOccurences = (Integer)entry.getValue();
+					}
+     	 }
+	  	//System.out.println();
+	  	//System.out.println("------------ Winner Alias : [ " + winnerAlias + " ] with [ " + winnerAliasOccurences + " ] occurences");	
+      //System.out.println("------------------------------------------------");
+	    
+			for(Iterator sortedListofAllSubstratesIt = sortedListofAllSubstrates.iterator(); sortedListofAllSubstratesIt.hasNext(); ) {
+			gate.Annotation subS = (Annotation)sortedListofAllSubstratesIt.next();
+			gate.FeatureMap subSFeats = subS.getFeatures();
+			String subAlias = null; 	
+				if (subSFeats.containsKey("substrate_alias")){
+	 		 		subAlias = (String)subSFeats.get("substrate_alias");
+					java.util.regex.Pattern winnerAliasPattern = java.util.regex.Pattern.compile(winnerAlias);
+					java.util.regex.Matcher winnerAliasMatcher = winnerAliasPattern.matcher(subAlias);
+					if(winnerAliasMatcher.find()){
+    				//offsets
+    				long begOffset = start(subS);
+    				long endOffset = end(subS);	  	
+						//add the substrate stats tag
+			      gate.FeatureMap subStatsFeatures = Factory.newFeatureMap();
+					  subStatsFeatures.put("#_Distinct_Substrates", countBySubstrateAliasMap.size());
+					  subStatsFeatures.put("Most_Frequent_Substrate", winnerAlias);
+					  subStatsFeatures.put("Most_Frequent_Substrate_Score", winnerAliasOccurences);
+					  outputAS.add(begOffset, endOffset, "SubstrateStats", subStatsFeatures);
+						break;
+			    }
+				}
+			}
+		}
+  } catch (Exception e){
+      System.out.println("Exception in substrate_count, substrate_count_rule: "+e); 
+  }        
+}	  
+

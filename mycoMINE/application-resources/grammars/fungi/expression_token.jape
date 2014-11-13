@@ -1,0 +1,41 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: expressionToken_annotation
+Input: Token
+Options: control = appelt
+
+Macro: EXPRESS
+(
+{Token.string =~"[Ee]xpress"}	// -ed/-ion
+|{Token.string =~"[Gg]ene product"}	// -s/-ion
+/* NOT SPECIFIC ENOUGH -- see for integration in lower level expression sentences
+|{Token.string =~"[Rr]egulat"}	// -ed/-ion
+|{Token.string =~"RNA"}
+*/
+)
+
+// Annotation of Tokens containing mentions potentially related to Gene Expression Process
+Rule: expressionToken_rule
+
+(
+	(EXPRESS)
+):expresstok
+-->
+:expresstok
+{
+  try{
+  	gate.Annotation expresstok_an = (gate.Annotation)expresstokAnnots.get("Token").iterator().next();
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.putAll(expresstok_an.getFeatures());
+		features.put("process", "gene_expression");
+		inputAS.remove(expresstok_an);
+		outputAS.add(expresstok_an.getStartNode(), expresstok_an.getEndNode(), "Token", features);
+  } catch (Exception e){
+      System.out.println("Exception in expression_token_annotation, expressionToken_rule: "+e); 
+  }        
+} 
+
+

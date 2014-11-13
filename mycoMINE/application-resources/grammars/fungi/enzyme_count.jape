@@ -1,0 +1,130 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+//
+// This JAPE rule counts the number of occurences  
+// for each enzyme by enzyme_alias.
+//
+
+Imports: {
+import static gate.Utils.*;
+}
+
+Phase: enzyme_count
+Input: Enzyme
+Options: control = once
+
+Rule: enzyme_count_rule
+(
+  {Enzyme}
+): enzymecount
+-->
+:enzymecount
+{
+  try{
+    // get all the enzymes in the current document
+    gate.AnnotationSet allEnz = doc.getAnnotations().get("Enzyme");
+    if ( allEnz == null ) {
+      System.out.println("No Enzyme found in this document.");
+    return;
+    } 
+    else {
+	// store the sorted enzyme annotation list to later find the first match of the most frequent enzyme
+    List<Annotation> sortedListofAllEnzymes = gate.Utils.inDocumentOrder(allEnz);  
+
+	// count maps
+    Map<String, Integer> countByEnzymeAliasMap = new TreeMap<String, Integer>();
+	Map<String, Integer> countByECNumberMap = new TreeMap<String, Integer>();
+
+    for(Iterator allEnzIt = allEnz.iterator(); allEnzIt.hasNext(); ) {
+	gate.Annotation enzY = (Annotation)allEnzIt.next();
+	gate.FeatureMap enzYFeats = enzY.getFeatures();
+		if (enzYFeats.containsKey("enzyme_alias")){
+		  String enzAlias = (String)enzYFeats.get("enzyme_alias");
+		  Integer count = (Integer)countByEnzymeAliasMap.get(enzAlias);
+		  if (count == null) {
+		    countByEnzymeAliasMap.put(enzAlias, 1);
+		  } else {
+		    countByEnzymeAliasMap.put(enzAlias, count + 1);
+		  }
+		  if (enzYFeats.containsKey("BRENDA_ECNumber")){
+		    String enzEC = (String)enzYFeats.get("BRENDA_ECNumber");
+		    Integer eccount = (Integer)countByECNumberMap.get(enzEC);
+		    if (eccount == null) {
+		      countByECNumberMap.put(enzEC, 1);
+		    } else {
+		      countByECNumberMap.put(enzEC, eccount + 1);
+		    }
+		  }
+		}
+      }
+      //System.out.println("-------- DISTINCT ENZYME ALIASES [ " + countByEnzymeAliasMap.size() + " ] --------");
+      //System.out.println("-------- DISTINCT ENZYME BRENDA EC NUMBERS  [ " + countByECNumberMap.size() + " ] --------");
+	  String winnerAlias = null;
+	  Integer winnerAliasOccurences = 0;
+	  Integer linejumpAlias = 0; 	
+      for (Map.Entry entry : countByEnzymeAliasMap.entrySet()) {
+		//linejumpAlias++;
+		//System.out.print( entry.getKey() + " [ " + entry.getValue() + " ]\t");
+		//if(linejumpAlias == 4){
+		//	System.out.println();
+		//	linejumpAlias = 0;
+		//}
+		if ((Integer)entry.getValue() > winnerAliasOccurences) {
+			winnerAlias = (String)entry.getKey();
+			winnerAliasOccurences = (Integer)entry.getValue();
+		}
+      }
+	  //System.out.println();	  
+	  String winnerEC = null;
+	  Integer winnerECOccurences = 0;
+	  Integer linejumpEC = 0;
+      for (Map.Entry entry : countByECNumberMap.entrySet()) {
+		 //linejumpEC++;
+		 //System.out.print( entry.getKey() + " [ " + entry.getValue() + " ]\t");
+		 //if(linejumpEC == 6){
+		 //	System.out.println();
+		 //	linejumpEC = 0;
+		 //}
+		if ((Integer)entry.getValue() > winnerECOccurences) {
+			winnerEC = (String)entry.getKey();
+			winnerECOccurences = (Integer)entry.getValue();
+		}
+      }
+		
+		// add the enzyme stat tag on the first occurence of the most fequent enzyme 		
+    for(Iterator sortedListofAllEnzymesIt = sortedListofAllEnzymes.iterator(); sortedListofAllEnzymesIt.hasNext(); ) {
+			gate.Annotation enzY = (Annotation)sortedListofAllEnzymesIt.next();
+			gate.FeatureMap enzYFeats = enzY.getFeatures();	
+			if (enzYFeats.containsKey("enzyme_alias")){
+		  	String enzAlias = (String)enzYFeats.get("enzyme_alias");
+				java.util.regex.Pattern winnerAliasPattern = java.util.regex.Pattern.compile(winnerAlias);
+				java.util.regex.Matcher winnerAliasMatcher = winnerAliasPattern.matcher(enzAlias);
+				if(winnerAliasMatcher.find()){
+    			//offsets
+    			long begOffset = start(enzY);
+    			long endOffset = end(enzY);
+					gate.FeatureMap enzStatsFeatures = Factory.newFeatureMap();
+	  			enzStatsFeatures.put("#_Distinct_Enzymes", countByEnzymeAliasMap.size());
+    			enzStatsFeatures.put("#_Distinct_BRENDA_EC_Numbers", countByECNumberMap.size());
+	  			enzStatsFeatures.put("Most_Frequent_Enzyme", winnerAlias);
+	  			enzStatsFeatures.put("Most_Frequent_Enzyme_Score", winnerAliasOccurences);
+	  			enzStatsFeatures.put("Most_Frequent_BRENDA_EC_Number", winnerEC);
+	  			enzStatsFeatures.put("Most_Frequent_BRENDA_EC_Number_Score", winnerECOccurences);
+	  			outputAS.add(begOffset, endOffset, "EnzymeStats", enzStatsFeatures);
+					break;
+				}
+			}
+		}
+	  //System.out.println();
+	  //System.out.println("------------ Winner Alias : [ " + winnerAlias + " ] with [ " + winnerAliasOccurences + " ] occurences");
+  	//System.out.println("------------ Winner EC : [ " + winnerEC + " ] with [ " + winnerECOccurences + " ] occurences");	
+    //System.out.println("------------------------------------------------");   
+    }
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_count, enzyme_count_rule: "+e); 
+  }        
+}	  
+

@@ -1,0 +1,38 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: kineticsSentence_annotation
+Input: Lookup Sentence
+Options: control = appelt
+
+Rule: kineticsSentence_rule
+(
+{Sentence contains {Lookup.majorType == "kinetics"}}
+): kinsent 
+-->
+:kinsent
+{
+try{
+  
+Annotation kinsent_an = (Annotation)kinsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", kinsent_an.getStartNode().getOffset(), kinsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(kinsentAnnots.firstNode().getOffset(), kinsentAnnots.lastNode().getOffset()).toString();
+features.put("kinetics_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type","Kinetics");
+
+outputAS.add(kinsent_an.getStartNode(), kinsent_an.getEndNode(), "Kinetics", features);
+  } catch (Exception e){
+      System.out.println("Exception in kinetics_annotation, kineticsSentence_rule: "+e); 
+  }        
+} 

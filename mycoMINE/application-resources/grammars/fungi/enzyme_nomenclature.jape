@@ -1,0 +1,113 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+Phase: enzyme_nomenclature 
+Input: Token Lookup TokenAggregation GreekAggregation
+Options: control = appelt
+
+Rule: EnzymeNomenclature_rule
+(
+  // *ase and *ases Tokens, TokenAggregations and GreekAggregations are possible enzyme names 
+    (
+      ({Token.string =~ "ase$",  ! Lookup.majorType == notanenzyme, !GreekAggregation})
+      |({TokenAggregation.string =~ "ase$",  ! Lookup.majorType == notanenzyme, !GreekAggregation})
+      |
+      ({GreekAggregation.greekaggregation_alias =~ "ase$",  ! Lookup.majorType == notanenzyme})
+    ):singular  
+    |
+    (
+      ({Token.string =~ "ases$", ! Lookup.majorType == notanenzyme, !GreekAggregation})
+      |({TokenAggregation.string =~ "ases$", ! Lookup.majorType == notanenzyme, !GreekAggregation}) 
+      |
+      ({GreekAggregation.greekaggregation_alias =~ "ases$", ! Lookup.majorType == notanenzyme}) 
+    ):plural
+)
+:enzname 
+-->
+:enzname
+
+{
+try{
+    String singularText ="";
+    String pluralText ="";
+    String singularFromPluralText ="";
+    String textAlias ="";
+
+    // singular mentions
+    gate.AnnotationSet singularSet = (gate.AnnotationSet)bindings.get("singular");
+    if ( singularSet != null ) {
+      gate.Annotation singularName = singularSet.iterator().next();
+//       singularText = (String) singularName.getFeatures().get("string");
+      gate.FeatureMap singularNameFeatures = singularName.getFeatures();
+      if (singularNameFeatures.containsKey("greekaggregation_fullName")){
+	singularText = (String) singularNameFeatures.get("greekaggregation_fullName");
+	textAlias = (String) singularNameFeatures.get("greekaggregation_alias");
+      }
+      else{
+	singularText = (String) singularNameFeatures.get("string");
+	textAlias = (String) singularNameFeatures.get("string");
+      }	  
+      
+      
+//     System.out.println("SINGtext is: " + singularText);
+         
+      gate.FeatureMap singularFeatures = Factory.newFeatureMap();
+      singularFeatures.put("majorType", "protein");    
+      singularFeatures.put("minorType", "enzyme");
+      singularFeatures.put("enzyme_alias", singularText);
+      singularFeatures.put("google_search", "http://www.google.com/search?q="+singularText.replaceAll("\\ ", "+"));
+      singularFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+singularText.replaceAll("\\ ", "_"));
+      singularFeatures.put("text_alias",textAlias);
+      singularFeatures.put("length", Integer.toString(singularText.length()));  
+      singularFeatures.put("rule", "EnzymeNomenclature_rule");
+      singularFeatures.put("rulesubcase", "singular_EnzymeNomenclature_rule");
+		singularFeatures.put("annot_type", "Enzyme");	
+		singularFeatures.put("class", "Enzyme");
+      outputAS.add(singularSet.firstNode(), singularSet.lastNode(), "EnzymeNameToken", singularFeatures);
+    }
+    
+    // plural mentions
+    gate.AnnotationSet pluralSet = (gate.AnnotationSet)bindings.get("plural"); 
+    gate.FeatureMap pluralFeatures = Factory.newFeatureMap();
+    
+    if ( pluralSet != null ) {
+      gate.Annotation pluralName = pluralSet.iterator().next();
+      gate.FeatureMap pluralNameFeatures = pluralName.getFeatures();
+      if (pluralNameFeatures.containsKey("greekaggregation_fullName")){
+	pluralText = (String) pluralNameFeatures.get("greekaggregation_fullName");
+	textAlias = (String) pluralNameFeatures.get("greekaggregation_alias");
+      }
+      else{
+	pluralText = (String) pluralNameFeatures.get("string");
+	textAlias = (String) pluralNameFeatures.get("string");
+      }	  
+//     System.out.println("PLURtext is: " + pluralText);
+      int pluralTextLength = pluralText.length();
+      // remove the final s
+      if (pluralTextLength > 2) {
+	int lastIndex = pluralTextLength - 1;
+	singularFromPluralText = pluralText.substring(0, lastIndex);
+      }    
+    
+      
+      pluralFeatures.put("majorType", "protein");    
+      pluralFeatures.put("minorType", "enzyme");
+      pluralFeatures.put("enzyme_alias", singularFromPluralText);
+      pluralFeatures.put("google_search", "http://www.google.com/search?q="+singularFromPluralText.replaceAll("\\ ", "+"));
+      pluralFeatures.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+singularFromPluralText.replaceAll("\\ ", "_"));
+      pluralFeatures.put("text_alias",textAlias);
+      pluralFeatures.put("length", Integer.toString(pluralText.length()));  
+      pluralFeatures.put("rule", "EnzymeNomenclature_rule");
+      pluralFeatures.put("rulesubcase", "plural_EnzymeNomenclature_rule");
+		pluralFeatures.put("annot_type", "Enzyme");
+		pluralFeatures.put("class", "Enzyme");
+      outputAS.add(pluralSet.firstNode(), pluralSet.lastNode(), "EnzymeNameToken", pluralFeatures);
+    }
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_nomenclature, EnzymeNomenclature_rule: "+e); 
+  }        
+}

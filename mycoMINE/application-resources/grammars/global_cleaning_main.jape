@@ -1,0 +1,11 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+MultiPhase:     Cleaning
+Phases:
+annotation_cleaning
+feature_cleaning

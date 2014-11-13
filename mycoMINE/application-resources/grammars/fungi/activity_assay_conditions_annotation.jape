@@ -1,0 +1,44 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: activityAssayConditions_annotation
+Input: Token Lookup Sentence Assay
+Options: control = appelt
+
+Rule: aacSentence_rule
+(
+{Sentence contains {Lookup.majorType=="buffer"}, Sentence contains {Lookup.majorType=="temperature"},Sentence contains {Token.string == "pH"}}
+|{Sentence contains Assay, Sentence contains {Token.string =~"[Aa]ctivit"}}
+
+): actasscondsent 
+-->
+:actasscondsent
+{
+try{
+
+
+//flag document as mentioning activity Assay Conditions
+doc.getFeatures().put("activityAssayConditions", "doctopic");
+  
+Annotation actasscondsent_an = (Annotation)actasscondsentAnnots.get("Sentence").iterator().next();
+AnnotationSet Sentence_ans= inputAS.get("Sentence", actasscondsent_an.getStartNode().getOffset(), actasscondsent_an.getEndNode().getOffset());
+
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return; 
+		      
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(actasscondsentAnnots.firstNode().getOffset(), actasscondsentAnnots.lastNode().getOffset()).toString();
+features.put("aac_alias", name);
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "Activity_Assay_Conditions");
+
+outputAS.add(actasscondsent_an.getStartNode(), actasscondsent_an.getEndNode(), "ActivityAssayConditions", features);
+  } catch (Exception e){
+      System.out.println("Exception in activityAssayConditions_annotation, aacSentence_rule: "+e); 
+  }        
+} 

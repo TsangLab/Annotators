@@ -1,0 +1,55 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: host_annotation
+Input: Organism
+//Input: HostOrganism
+Options: control = appelt
+
+// annotates Host Organism from Organism[host feature = yes] in ExpressionTrainingSet
+Rule: host_rule
+(
+{Organism.organism_host == "yes"}
+): hostorg 
+-->
+:hostorg
+{
+try{
+  
+Annotation hostorg_an = (Annotation)hostorgAnnots.get("Organism").iterator().next();
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features.putAll(hostorg_an.getFeatures()); 
+// rq.: remove organism_host = yes
+
+outputAS.add(hostorg_an.getStartNode(), hostorg_an.getEndNode(), "Host", features);
+  } catch (Exception e){
+      System.out.println("Exception in host_annotation, host_rule: "+e); 
+  }        
+} 
+
+// remove Host annotation
+/*Rule: host_rule
+(
+{Host}
+): hostorg 
+-->
+:hostorg
+{
+try{
+  
+Annotation hostorg_an = (Annotation)hostorgAnnots.get("Host").iterator().next();
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features.putAll(hostorg_an.getFeatures()); 
+// rq.: remove organism_host = yes
+
+inputAS.remove(hostorg_an);
+  } catch (Exception e){
+      System.out.println("Exception in host_annotation, host_rule: "+e); 
+  }        
+} 
+*/

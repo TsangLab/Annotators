@@ -1,0 +1,94 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+// JAPE rule for annotation of a string including no space as a complete entity if it contains a greekletter 
+Imports: {
+import static gate.Utils.*;
+}
+
+Phase: greek_minimal_offset 
+Input: tempGreekAggreg
+Options: control = all
+
+Rule: greekMinimalOffset
+(
+  {tempGreekAggreg}
+):greekmin
+-->
+:greekmin
+{
+  try{
+    // gets the annotationSets and annotations for each label   
+    gate.Annotation greekminAnn = (gate.Annotation)greekminAnnots.get("tempGreekAggreg").iterator().next();
+    gate.AnnotationSet greekminAnnSet = inputAS.get("tempGreekAggreg", greekminAnn.getStartNode().getOffset(), greekminAnn.getEndNode().getOffset());
+
+    if(greekminAnnSet==null) return;
+    if(greekminAnnSet.isEmpty()) return;
+
+    //offsets
+    long begOffset = start(greekminAnn);
+    long endOffset = end(greekminAnn);
+    
+    String greekContent =  doc.getContent().getContent(greekminAnnSet.firstNode().getOffset(), greekminAnnSet.lastNode().getOffset()).toString();
+    String fullNameGreekLetterContent = greekContent;
+    // content initial size
+    int initsize = greekContent.length();
+    //**** remove ending coma
+    greekContent = greekContent.replaceAll(",$", "");
+    // correct offset
+    if(greekContent.length() < initsize) {
+      endOffset--;
+      initsize = greekContent.length();
+    }
+    //**** remove ending dot
+    greekContent = greekContent.replaceAll("\\.$", ""); 
+    // correct offset
+    if(greekContent.length() < initsize) {
+      endOffset--;
+      initsize = greekContent.length();
+    }
+    //**** remove orphan parentheses
+    int closeparindex = greekContent.indexOf(')');
+    int openparindex = greekContent.indexOf('('); 
+    if((openparindex < 0) || (closeparindex < 0) || (openparindex > closeparindex)){
+      initsize = greekContent.length();
+      greekContent = greekContent.replaceAll("^\\(|^\\)", "");
+      // correct offset for begining ( removed
+      if(greekContent.length() < initsize) {
+      begOffset++;
+      initsize = greekContent.length();
+      }
+      greekContent = greekContent.replaceAll("\\)$|\\($", "");
+      // correct offset for ending )
+      if(greekContent.length() < initsize) {
+      endOffset--;
+      initsize = greekContent.length();
+      }
+      greekContent = greekContent.replaceAll("\\(", "");  
+      greekContent = greekContent.replaceAll("\\)", "");
+    }
+    
+    FeatureMap greekminAnnFeatures  = greekminAnn.getFeatures();
+//     Boolean abbrAlreadyTagEnz = false;
+    if (greekminAnnFeatures.containsKey("greek_letter_name")){
+      String greekLetterName = "";
+      greekLetterName = (String)greekminAnnFeatures.get("greek_letter_name");
+      if (greekminAnnFeatures.containsKey("greek_letter")){
+	String greekLetter = "";
+	greekLetter = (String)greekminAnnFeatures.get("greek_letter");
+        fullNameGreekLetterContent = greekContent.replaceAll(greekLetter, greekLetterName);
+      }
+    }
+
+    FeatureMap features = Factory.newFeatureMap();
+    features.put("greekaggregation_fullName", fullNameGreekLetterContent);
+    features.put("greekaggregation_alias", greekContent);
+    outputAS.add(begOffset, endOffset, "GreekAggregation", features);
+    inputAS.remove(greekminAnn);
+  }
+  catch (Exception e){
+      System.out.println("Exception in greek_minimal_offset, greekMinimalOffset_rule: "+e); 
+  }
+}

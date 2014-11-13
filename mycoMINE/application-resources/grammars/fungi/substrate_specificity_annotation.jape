@@ -1,0 +1,45 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: substrateSpecificitySentence_annotation
+//Input: Lookup Sentence
+Input: Token Sentence Substrate
+Options: control = appelt
+
+Rule: substrateSpecificitySentence_rule
+(
+//{Sentence contains {Lookup.majorType == "substratespecificity"}}
+{Sentence contains {Token.string =~"[Ss]ubstrate specificit"}}
+|{Sentence contains {Token.string =~"[Ss]ubstrate"}, Sentence contains {Token.string =~"[Ss]pecificit"}}
+|{Sentence contains Substrate, Sentence contains {Token.string =~"[Ss]pecificit"}}
+): subspecsent 
+-->
+:subspecsent
+{
+try{
+
+//flag document as mentioning substrate Specificity
+doc.getFeatures().put("substrateSpecificity", "doctopic");
+  
+Annotation subspecsent_an = (Annotation)subspecsentAnnots.get("Sentence").iterator().next();
+AnnotationSet  Sentence_ans= inputAS.get("Sentence", subspecsent_an.getStartNode().getOffset(), subspecsent_an.getEndNode().getOffset());
+
+if(Sentence_ans==null) return;
+if(Sentence_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(subspecsentAnnots.firstNode().getOffset(), subspecsentAnnots.lastNode().getOffset()).toString();
+features.put("substrate_specificity_alias", name); 
+//features.put("annotation_level", "sentence");
+features.put("annot_type", "Substrate_Specificity");
+
+outputAS.add(subspecsent_an.getStartNode(), subspecsent_an.getEndNode(), "SubstrateSpecificity", features);
+  } catch (Exception e){
+      System.out.println("Exception in substrate_specificity_annotation, substrateSpecificitySentence_rule: "+e); 
+  }        
+} 

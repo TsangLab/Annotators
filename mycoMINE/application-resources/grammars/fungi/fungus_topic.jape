@@ -1,0 +1,29 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: fungus_topic
+
+Input: Token
+Options: control = once
+
+Rule: FungusTopic_rule
+(
+{Token.string =~"[Ff]ung[aiu]"}
+): fung
+-->
+//:fung.Fungus = {annot_type = "Fungus", fungus_alias = :fung@string, kind = "doctopic" }, 
+:fung
+{
+try{
+   
+	//flag document as fungal related topic
+	doc.getFeatures().put("fungus", "doctopic");
+
+   } catch (Exception e){
+       System.out.println("Exception in fungus_topic, FungusTopic_rule: "+e); 
+   }        
+} 
+
+

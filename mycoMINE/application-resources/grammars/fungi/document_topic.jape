@@ -1,0 +1,80 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Imports: { 
+import java.net.*;
+}
+
+Phase: doctopic_extraction
+Input: Token
+Options: control = once
+
+// print url of documents given their topic
+Rule: doctopic_rule
+(
+{Token}
+): doctopic 
+-->
+:doctopic
+{
+/* print out doc list
+File outoftopicdoc = new File ("/home/vboxer/Expression/off_topic_documents.txt");
+File topicdoc = new File ("/home/vboxer/Expression/relevant_topic_documents.txt");
+*/
+URL docSourceUrl = doc.getSourceUrl();
+try{
+
+	//get expression sentence
+	Annotation tok_an = (Annotation)doctopicAnnots.get("Token").iterator().next();
+
+	//get document by topic
+	boolean exprdoc = doc.getFeatures().containsKey("expressionL0");
+	boolean fungdoc = doc.getFeatures().containsKey("fungus");
+	boolean specactdoc = doc.getFeatures().containsKey("specificActivity");
+	boolean actassdoc = doc.getFeatures().containsKey("activityAssayConditions");
+	boolean subspecdoc = doc.getFeatures().containsKey("substrateSpecificity");
+	boolean charactdoc = doc.getFeatures().containsKey("characterization");
+	if(fungdoc){
+		if(exprdoc || specactdoc || actassdoc || subspecdoc || charactdoc){ 
+			/* print out list of mycoCLAP docs
+			PrintWriter td = new PrintWriter (new BufferedWriter (new FileWriter (topicdoc, true)));
+			td.println (docSourceUrl);
+			td.close();
+			*/
+			doc.getFeatures().put("mycoCLAP", "doctopic");
+		}
+		/* print out list of outoftopicdoc doc
+		else{	// print doc url
+			try{
+				
+				//write doc url into a text file 
+				PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (outoftopicdoc, true)));
+				pw.println (docSourceUrl);
+				pw.close();
+			}
+			catch (IOException exception) {
+			}
+		}
+	} // do not print doc url
+	else{	// print doc url
+		try{
+			//write doc url into a text file 
+			PrintWriter pw = new PrintWriter (new BufferedWriter (new FileWriter (outoftopicdoc, true)));
+			pw.println (docSourceUrl);
+			pw.close();
+		}
+		catch (IOException exception)
+		{
+	
+		}
+*/
+	}
+  } catch (Exception e){
+      System.out.println("Exception in doctopic_extraction, doctopic_rule: "+e); 
+  }        
+} 
+
+//-------------------//
+

@@ -1,0 +1,70 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+
+Phase: enzyme_abbreviation_find 
+Input: Token Enzyme Lookup EnzymeAggregationLookup
+Options: control = appelt
+
+Rule: EnzymeAbbreviationFind_rule
+(
+  // Catch unknown enzyme abbreviations like "EG" in endoglucanase ("EG")
+  // filter false positive from DB names (ex: Online Mendelian Inheritance in Man (OMIM))
+    (
+      ({Enzyme notWithin {Lookup.majorType == dbname}}):refenz
+      {Token.kind == punctuation, Token.position == startpunct, Token.string == "("}
+    )
+    (
+      {Token.kind == word, Token.length >= 2, !Enzyme, !Lookup.majorType == "notanenzyme"}
+//      |{Enzyme, !EnzymeAggregationLookup}
+      |{Enzyme}
+    ):abbrenz
+    (
+      {Token.kind == punctuation, Token.position == endpunct, Token.string == ")"}
+    )
+)
+: abbrcatcher 
+-->
+:abbrcatcher
+{
+try{
+    gate.AnnotationSet abbrEnzSet = (gate.AnnotationSet)bindings.get("abbrenz");
+    Annotation abbrEnz = abbrEnzSet.iterator().next();
+    // get the abbreviated enzyme features
+    FeatureMap abbrEnzFeatures  = abbrEnz.getFeatures();
+    String textAbbrEnz = "";
+    if (abbrEnzFeatures.containsKey("string")){
+      textAbbrEnz = (String)abbrEnzFeatures.get("string");
+    }
+    if (abbrEnzFeatures.containsKey("enzyme_alias")){
+      textAbbrEnz = (String)abbrEnzFeatures.get("enzyme_alias");
+      // remove the Enzyme tag if exists
+      inputAS.removeAll(abbrEnzSet);			
+			}
+
+    gate.AnnotationSet refEnzSet = (gate.AnnotationSet)bindings.get("refenz");
+    Annotation refEnz = refEnzSet.iterator().next();
+    // get the reference enzyme features
+    FeatureMap refEnzFeatures  = refEnz.getFeatures();
+    String textRefEnz = "";
+    textRefEnz = (String)refEnzFeatures.get("enzyme_alias");
+   
+    //add the updated tag
+    gate.FeatureMap features = Factory.newFeatureMap();
+    features.putAll(refEnzFeatures);
+    features.put("abbreviation_alias", textAbbrEnz);
+    features.put("isAbbreviationOf", textRefEnz);
+//    features.put("kind", "nonStandardAbbreviation");
+    features.put("style", "nonStandardAbbreviation");
+    features.put("rule", "EnzymeAbbreviation");
+    features.put("annot_type", "Enzyme");
+    features.put("class", "Enzyme");
+    outputAS.add(abbrEnzSet.firstNode(), abbrEnzSet.lastNode(), "EnzymeAbbreviation", features);
+
+  } catch (Exception e){
+      System.out.println("Exception in enzyme_abbreviation, EnzymeAbbreviation_rule: "+e); 
+  }       
+}

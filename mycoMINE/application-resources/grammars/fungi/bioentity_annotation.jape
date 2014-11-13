@@ -1,0 +1,56 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: bioentity_annotation
+Input: Token Sentence Enzyme Organism Assay Buffer Gene Substrate Strain Fungus Family AccessionNumber pH Glycosylation Temperature SpecificActivity SubstrateSpecificity Kinetics ProductAnalysis ActivityAssayConditions EnzymeAbbreviation EnzymeAbbreviationReference
+Options: control = all
+
+/* 
+BIOENTITY = macro to gather bioentities.
+The feature "bioentity" could also be added 
+to each corresponding tag but using these 
+macro is more flexible for now.
+*/
+Macro: BIOENTITY
+({Enzyme, Token.length > 3}|
+{Organism}|
+{Assay}|
+{Buffer}|
+{Gene}|
+{Substrate}|
+{Strain}|
+{Fungus}|
+{Family}|
+// replace the following part with gazetteer approach designed for generic terms
+{Token.string == "enzyme"}|{Token.string == "enzymes"}|{Token.string == "Enzyme"}|{Token.string == "Enzymes"}|
+{Token.string == "organism"}|{Token.string == "organisms"}|{Token.string == "Organism"}|{Token.string == "Organisms"}|
+{Token.string == "assay"}|{Token.string == "assays"}|{Token.string == "Assay"}|{Token.string == "Assays"}|
+{Token.string == "buffer"}|{Token.string == "buffers"}|{Token.string == "Buffer"}|{Token.string == "Buffers"}|
+{Token.string == "gene"}|{Token.string == "genes"}|{Token.string == "Gene"}|{Token.string == "Genes"}|
+{Token.string == "substrate"}|{Token.string == "substrates"}|{Token.string == "Substrate"}|{Token.string == "Substrates"}|
+{Token.string == "strain"}|{Token.string == "strains"}|{Token.string == "Strain"}|{Token.string == "Strains"}|
+{Token.string == "fungus"}|{Token.string == "fungi"}|{Token.string == "Fungus"}|{Token.string == "Fungi"}|
+{Token.string == "family"}|{Token.string == "families"}|{Token.string == "Family"}|{Token.string == "Families"}
+)
+
+Rule: bioEntityAnnotation
+(
+	(BIOENTITY)
+)
+:bioent
+-->
+:bioent
+{
+	try{
+		gate.AnnotationSet bioentSet = (gate.AnnotationSet)bindings.get("bioent");
+		gate.Annotation bioent_an = bioentSet.iterator().next();
+		gate.FeatureMap features = Factory.newFeatureMap();	
+		features.put("class", "bio");
+		outputAS.add(bioent_an.getStartNode(), bioent_an.getEndNode(), "BioEntity", features);
+  } catch (Exception e){
+      System.out.println("Exception in bioentity_annotation, bioEntityAnnotation_rule: "+e); 
+  }  
+}
+

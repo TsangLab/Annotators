@@ -1,0 +1,117 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+//
+// This JAPE rule counts the number of occurences  
+// for each organism by organism_alias.
+//
+
+Imports: {
+import static gate.Utils.*;
+}
+
+Phase: organism_count
+Input: Organism
+Options: control = once
+
+Rule: organism_count_rule
+(
+  {Organism}
+): organismcount
+-->
+:organismcount
+{
+  try{
+    // get all the organisms in the current document
+    gate.AnnotationSet allOrg = doc.getAnnotations().get("Organism");
+    if ( allOrg == null ) {
+      System.out.println("No Organism found in this document.");
+    return;
+    } 
+    else {
+			// store the sorted organism annotation list to later find the first match of the most frequent organism
+    	List<Annotation> sortedListofAllOrganisms = gate.Utils.inDocumentOrder(allOrg);      
+		
+      Map<String, Integer> countByOrganismAliasMap = new TreeMap<String, Integer>();
+
+      for(Iterator allOrgIt = allOrg.iterator(); allOrgIt.hasNext(); ) {
+			gate.Annotation orgA = (Annotation)allOrgIt.next();
+			gate.FeatureMap orgAFeats = orgA.getFeatures();
+				//if (orgAFeats.containsKey("organism_alias")){
+				if (orgAFeats.containsKey("organism_scientific_name")){	  
+				//String orgAlias = (String)orgAFeats.get("organism_alias");
+	  			String orgAlias = (String)orgAFeats.get("organism_scientific_name");	  
+	  			Integer count = (Integer) countByOrganismAliasMap.get(orgAlias);
+	  			if (count == null) {
+	    			countByOrganismAliasMap.put(orgAlias, 1);
+	  			} else {
+	    			countByOrganismAliasMap.put(orgAlias, count + 1);
+	  			}
+				}
+				else{
+	  			if (orgAFeats.containsKey("organism_alias")){
+	    			String orgAlias = (String)orgAFeats.get("organism_alias");
+	    	  	Integer count = (Integer) countByOrganismAliasMap.get(orgAlias);
+	    	  	if (count == null) {
+							countByOrganismAliasMap.put(orgAlias, 1);
+	    	  	} else {
+						countByOrganismAliasMap.put(orgAlias, count + 1);
+	    	  	}
+	  			}
+				}
+      }
+      //System.out.println("-------- DISTINCT ORGANISMS [ " + countByOrganismAliasMap.size() + " ] --------");
+	  	String winnerAlias = null;
+	  	Integer winnerAliasOccurences = 0;
+	  	Integer linejumpAlias = 0; 
+      for (Map.Entry entry : countByOrganismAliasMap.entrySet()) {
+		//linejumpAlias++;
+		//System.out.print( entry.getKey() + " [ " + entry.getValue() + " ]\t");
+		//if(linejumpAlias == 4){
+		//	System.out.println();
+		//	linejumpAlias = 0;
+		//}
+				if ((Integer)entry.getValue() > winnerAliasOccurences) {
+					winnerAlias = (String)entry.getKey();
+					winnerAliasOccurences = (Integer)entry.getValue();
+				}
+      }
+
+			// add the organism stat tag on the first occurence of the most fequent organism 		
+	    for(Iterator sortedListofAllOrganismsIt = sortedListofAllOrganisms.iterator(); sortedListofAllOrganismsIt.hasNext(); ) {
+			gate.Annotation orgA = (Annotation)sortedListofAllOrganismsIt.next();
+			gate.FeatureMap orgAFeats = orgA.getFeatures();
+			String orgAlias = null; 	
+				if (orgAFeats.containsKey("organism_alias")){
+					if (orgAFeats.containsKey("organism_scientific_name")){
+		 		 		orgAlias = (String)orgAFeats.get("organism_scientific_name");
+					} else {
+		 		 		orgAlias = (String)orgAFeats.get("organism_alias");
+					}
+					java.util.regex.Pattern winnerAliasPattern = java.util.regex.Pattern.compile(winnerAlias);
+					java.util.regex.Matcher winnerAliasMatcher = winnerAliasPattern.matcher(orgAlias);
+					if(winnerAliasMatcher.find()){
+    				//offsets
+    				long begOffset = start(orgA);
+    				long endOffset = end(orgA);
+	  //System.out.println();
+	  //System.out.println("------------ Winner Alias : [ " + winnerAlias + " ] with [ " + winnerAliasOccurences + " ] occurences");	
+    //System.out.println("------------------------------------------------");
+	  				//add the organism stats tag
+    				gate.FeatureMap orgStatsFeatures = Factory.newFeatureMap();
+	  				orgStatsFeatures.put("#_Distinct_Organisms", countByOrganismAliasMap.size());
+	  				orgStatsFeatures.put("Most_Frequent_Organism", winnerAlias);
+	  				orgStatsFeatures.put("Most_Frequent_Organism_Score", winnerAliasOccurences);
+	  				outputAS.add(begOffset, endOffset, "OrganismStats", orgStatsFeatures);
+						break;
+    			}
+				}
+			}
+		}
+  } catch (Exception e){
+      System.out.println("Exception in organism_count, enzyme_count_rule: "+e); 
+  }        
+}	  
+

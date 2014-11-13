@@ -1,0 +1,79 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: family_annotation
+Input: Lookup Token Enzyme
+Options: control = appelt
+
+Rule: Family_rule
+(
+//
+{Lookup.majorType=="family"}
+// 
+|({Token.string == "GH"}{Token.kind == "number"}):ghnum
+//
+|{Lookup.minorType=="enzyme"}
+  (
+  {Token.string == "family"} 
+  |{Token.string == "families"}
+  )
+|{Enzyme} 
+  (
+  {Token.string == "family"}
+  | {Token.string == "families"}
+  )
+//
+|
+  (
+   {Token.string == "glycoside"}
+   |{Token.string == "Glycoside"}
+  )
+  (
+  {Token.string == "hydrolase"}
+  |{Token.string == "Hydrolase"}
+  )
+  (
+  {Token.string == "family"}|
+  {Token.string == "families"}
+  )
+)
+: fam 
+-->
+:fam
+{
+try{
+gate.AnnotationSet fam_ans = (gate.AnnotationSet)bindings.get("fam");
+gate.AnnotationSet ghnum_ans = (gate.AnnotationSet)bindings.get("ghnum");
+
+if(fam_ans==null) return;
+if(fam_ans.isEmpty()) return;
+
+gate.FeatureMap features = Factory.newFeatureMap();
+features = Factory.newFeatureMap();
+
+String name = doc.getContent().getContent(fam_ans.firstNode().getOffset(), fam_ans.lastNode().getOffset()).toString();
+String abbrGH = "";
+  if(ghnum_ans != null && ghnum_ans.size() != 0) {
+    abbrGH = doc.getContent().getContent(ghnum_ans.firstNode().getOffset(), ghnum_ans.lastNode().getOffset()).toString();
+    features.put("family_alias", abbrGH);
+    features.put("family_name", "Glycoside Hydrolase " + abbrGH + " family");
+    features.put("CAZy", "http://www.cazy.org/"+abbrGH);
+	features.put("annot_type", "Family");
+	features.put("class", "Family");
+  }
+else{
+    features.put("family_alias", name);
+    features.put("family_name", name);
+	features.put("annot_type", "Family");
+	features.put("class", "Family");
+  }
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+outputAS.add(fam_ans.firstNode(), fam_ans.lastNode(), "Family", features);
+  } catch (Exception e){
+      System.out.println("Exception in family_annotation, Family_rule: "+e); 
+  }        
+} 

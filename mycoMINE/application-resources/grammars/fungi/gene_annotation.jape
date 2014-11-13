@@ -1,0 +1,37 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: gene_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Gene_rule
+({Lookup.majorType=="gene"}): gen 
+-->
+:gen
+{
+try{
+  
+Annotation gen_an = (Annotation)genAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", gen_an.getStartNode().getOffset(), gen_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return; 
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(genAnnots.firstNode().getOffset(), genAnnots.lastNode().getOffset()).toString();
+features.put("gene_alias", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+features.put("class", "Gene");
+features.put("annot_type", "Gene");
+outputAS.add(gen_an.getStartNode(), gen_an.getEndNode(), "Gene", features);
+  } catch (Exception e){
+      System.out.println("Exception in gene_annotation, Gene_rule: "+e); 
+  }        
+} 

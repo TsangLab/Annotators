@@ -1,0 +1,42 @@
+<!-- resource.xml FeatureMapper -->
+<!--  mjmeurs, 04/2011 -->
+
+<CREOLE-DIRECTORY>
+
+<CREOLE>
+    <RESOURCE>
+      <NAME>FeatureMapper</NAME>
+      <JAR>FeatureMapper.jar</JAR>
+      <CLASS>featuremapper.FeatureMapper</CLASS>
+    	  
+   	 <PARAMETER NAME="targetedAnnotation"
+	     RUNTIME="true"
+	     OPTIONAL="false"
+	     COMMENT="The name of the targeted annotation ">
+	     java.lang.String
+	  </PARAMETER>
+
+   	 <PARAMETER NAME="mappedFeature"
+	     RUNTIME="true"
+	     OPTIONAL="false"
+	     COMMENT="The name of the mapped feature ">
+	     java.lang.String
+	  </PARAMETER>
+
+   	 <PARAMETER NAME="createdFeature"
+	     RUNTIME="true"
+	     OPTIONAL="false"
+	     COMMENT="The name of the feature that will be created by this component">
+	     java.lang.String
+	  </PARAMETER>
+
+      <PARAMETER NAME="mappingFile"
+	RUNTIME="true"
+	OPTIONAL="false"
+	COMMENT="The file containing a string to string mapping (format = mappedFeature value \t createdFeature value \n)">
+	java.net.URL
+      </PARAMETER>                 
+   </RESOURCE>
+</CREOLE>
+
+</CREOLE-DIRECTORY>

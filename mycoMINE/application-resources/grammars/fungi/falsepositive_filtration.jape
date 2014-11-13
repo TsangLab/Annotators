@@ -1,0 +1,68 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: falsepositive_filtration
+Input: Token SpaceToken Lookup Sentence Enzyme Organism Assay Buffer Gene Substrate Strain Fungus Family AccessionNumber pH Glycosylation Temperature SpecificActivity SubstrateSpecificity Kinetics ProductAnalysis ActivityAssayConditions EnzymeAbbreviation EnzymeAbbreviationReference 
+BioEntity BioSentence
+Options: control = all
+
+Rule: RemoveEnzymeFalsePositiveAbbreviation
+(
+	{Enzyme, Token.length < 4 , !EnzymeAbbreviation, !EnzymeAbbreviationReference, !Enzyme within BioSentence}
+)
+:fpabmnh
+-->
+:fpabmnh
+{
+	try{
+	gate.Annotation fpabmnh_an = (gate.Annotation)fpabmnhAnnots.get("Enzyme").iterator().next();
+    inputAS.remove(fpabmnh_an);
+  } catch (Exception e){
+      System.out.println("Exception in abbreviationFiltration, RemoveEnzymeFalsePositiveAbbreviation_rule: "+e); 
+  }  
+}
+
+/* priority is given to Enzyme and Gene mentions if longer than the Organism ones*/
+Rule: RemoveOrganismInEnzymeorGene
+(
+	{Organism within Enzyme}
+	|{Organism within Gene}
+	|{Organism within {Lookup.class == Gene}}
+	|{Organism within {Lookup.majorType == dbname}}
+)
+:notanorg
+-->
+:notanorg
+{
+	try{
+	gate.Annotation notanorg_an = (gate.Annotation)notanorgAnnots.get("Organism").iterator().next();
+    inputAS.remove(notanorg_an);
+//    System.out.println("False Organism removed -- RemoveOrganismInEnzymeorGene_rule in falsepositive_filtration.jape");
+  } catch (Exception e){
+      System.out.println("Exception in abbreviationFiltration, RemoveOrganismInEnzymeorGene_rule: "+e); 
+  }  
+}
+
+/* Remove organism names nested in tokens as substring (ex: Man5A is the man1 gene product. No Homo Sapiens involved*/
+Rule: RemoveOrganismAsTokenSubstring
+(
+	({Organism within Token}
+	|{Organism, Token}
+	)
+	{!SpaceToken, !Token.kind == punctuation, Token}
+)
+:notanorg
+-->
+:notanorg
+{
+	try{
+	gate.Annotation notanorg_an = (gate.Annotation)notanorgAnnots.get("Organism").iterator().next();
+    inputAS.remove(notanorg_an);
+    System.out.println("False Organism removed -- RemoveOrganismAsTokenSubstring_rule in falsepositive_filtration.jape");
+  } catch (Exception e){
+      System.out.println("Exception in abbreviationFiltration, RemoveOrganismAsTokenSubstring_rule: "+e); 
+  }  
+}
+

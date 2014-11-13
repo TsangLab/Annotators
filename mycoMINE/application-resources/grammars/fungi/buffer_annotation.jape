@@ -1,0 +1,39 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+
+Phase: buffer_annotation
+Input: Lookup
+Options: control = appelt
+
+Rule: Buffer_rule1
+({Lookup.majorType=="buffer"}): buff 
+-->
+:buff
+{
+try{
+  
+Annotation buff_an = (Annotation)buffAnnots.get("Lookup").iterator().next();
+AnnotationSet  Lookup_ans= inputAS.get("Lookup", buff_an.getStartNode().getOffset(), buff_an.getEndNode().getOffset());
+
+if(Lookup_ans==null) return;
+if(Lookup_ans.isEmpty()) return; 
+
+gate.FeatureMap features = Factory.newFeatureMap();
+//features.put("kind", "buffer");
+
+features = Factory.newFeatureMap();
+String name = doc.getContent().getContent(buffAnnots.firstNode().getOffset(), buffAnnots.lastNode().getOffset()).toString();
+features.put("buffer_alias", name);
+features.put("buffer_name", name);
+features.put("google_search", "http://www.google.com/search?q="+name.replaceAll("\\ ", "+"));
+features.put("wikipedia_search", "http://en.wikipedia.org/wiki/"+name.replaceAll("\\ ", "_"));
+features.put("annot_type", "Buffer");
+features.put("class", "Buffer");
+outputAS.add(buff_an.getStartNode(), buff_an.getEndNode(), "Buffer", features);
+  } catch (Exception e){
+      System.out.println("Exception in buffer_annotation, Buffer_rule1: "+e); 
+  }        
+} 

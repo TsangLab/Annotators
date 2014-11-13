@@ -1,0 +1,57 @@
+/*
+mycoMINE @CSFG
+2013
+Marie-Jean Meurs
+*/
+Phase: FeatureCleaning
+Input: Enzyme Fungus
+Options: control = all
+
+Rule:RemoveDebugEnzymeFeatures
+(
+{Enzyme}
+)
+:mnh
+-->
+:mnh
+{
+	try{
+		Annotation enz_an = (Annotation)mnhAnnots.get("Enzyme").iterator().next();
+		//AnnotationSet  enz_ans= inputAS.get("Enzyme", enz_an.getStartNode().getOffset(), enz_an.getEndNode().getOffset());
+		//remove debug features
+		enz_an.getFeatures().remove("length");
+		enz_an.getFeatures().remove("majorType");
+		enz_an.getFeatures().remove("minorType");
+		enz_an.getFeatures().remove("rule");
+		enz_an.getFeatures().remove("rulesubcase");
+		enz_an.getFeatures().remove("text_alias");
+		enz_an.getFeatures().remove("kind");
+		enz_an.getFeatures().remove("style");
+		enz_an.getFeatures().remove("rule4link");
+   } catch (Exception e){
+       System.out.println("Exception in feature_cleaning, RemoveUselessEnzymeFeatures: "+e); 
+   } 
+
+}
+
+Rule:RemoveDebugFungusFeatures
+(
+{Fungus}
+)
+:mnh
+-->
+:mnh
+{
+	try{
+		Annotation fung_an = (Annotation)mnhAnnots.get("Fungus").iterator().next();
+		//AnnotationSet  enz_ans= inputAS.get("Enzyme", enz_an.getStartNode().getOffset(), enz_an.getEndNode().getOffset());
+		//remove debug features
+		fung_an.getFeatures().remove("length");
+		fung_an.getFeatures().remove("majorType");
+		fung_an.getFeatures().remove("minorType");
+		fung_an.getFeatures().remove("ontology");
+   } catch (Exception e){
+       System.out.println("Exception in feature_cleaning, RemoveUselessEnzymeFeatures: "+e); 
+   } 
+
+}
